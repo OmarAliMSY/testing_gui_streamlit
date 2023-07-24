@@ -107,9 +107,9 @@ def gen_field_data(n_field,n_trackers):
         snap7.util.set_int(DB504data_obj_list[n_field], 2246+err*16, 4*i_bool )
     
     for event in range(31*3):
-        db511_obj_list[n_field][event]['tr_adress']=int(i_bool)*7
-        db511_obj_list[n_field][event]['errorcode']=int(i_bool)*1
-        #d511_obj_list[n_field][i]['timestamp']=time.ctime()
+        db511_obj_list[n_field][event]['tr_adress']=int(2)*7
+        db511_obj_list[n_field][event]['errorcode']=int(3)*8
+        
         
     for n_tr in range(n_trackers):
         
@@ -123,7 +123,7 @@ def gen_field_data(n_field,n_trackers):
         #db110_obj_list[n_field][n_tr]['local']       =   i_bool
         db110_obj_list[n_field][n_tr]['STW1']        =   12+int(i_bool)
         db110_obj_list[n_field][n_tr]['STW2']        =   127+int(i_bool)
-        
+        db110_obj_list[n_field][n_tr]['Torque']        =   31
         
         #                    DBobject[index]            Data location                       Simulated value
         snap7.util.set_real(DB110data_obj_list[n_field],   POS_LASTSETPOINT+4*n_tr ,           10*i+(n_tr+1)*10    )
@@ -137,10 +137,10 @@ def gen_field_data(n_field,n_trackers):
         # DB504
         
         for n_err in range(3):
-            db504_tr_obj_list[n_field][n_tr]['wz_adress_'+str(n_err+1)] = 1
+            db504_tr_obj_list[n_field][n_tr]['wz_adress_'+str(n_err+1)] = 11
             db504_tr_obj_list[n_field][n_tr]['tr_adress_'+str(n_err+1)] = n_tr
-            db504_tr_obj_list[n_field][n_tr]['errorcode_'+str(n_err+1)] = int(i_bool)
-            #db504_tr_obj_list[n_field][n_tr]['timestamp_'+str(n_err+1)] = time.ctime()
+            db504_tr_obj_list[n_field][n_tr]['errorcode_'+str(n_err+1)] = 5
+            #db504_tr_obj_list[n_field][n_tr]['timestamp_' + str(n_err + 1)] = time.time()
             
          
         

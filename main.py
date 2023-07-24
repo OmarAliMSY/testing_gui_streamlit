@@ -8,11 +8,21 @@ import db_layout as layouts
 import plotly.express as px
 import pandas as pd
 from db_layout import *
+
+
 st.set_page_config(
-    page_title="Real-Time Data Science Dashboard",
-    page_icon="✅",
+    page_title="Ex-stream-ly Cool App",
+    page_icon="🧊",
     layout="wide",
-)
+    initial_sidebar_state="expanded",
+    menu_items={
+        'Get Help': 'https://www.extremelycoolapp.com/help',
+        'Report a bug': "https://www.extremelycoolapp.com/bug",
+        'About': "# This is a header. This is an *extremely* cool app!"
+    })
+
+st.header('DAQ')
+
 def get_att(dbb_layout):
     """
     Process the database layout and extract attributes.
@@ -28,7 +38,9 @@ def get_att(dbb_layout):
     item_list = [x.strip().split() for x in dbb_layout.split("\n") if x.strip()]
     db_dict = {int(float(row[0])): row[2] for row in item_list}
     db_dt = {row[0]: row[1] for row in item_list}
-    return db_dt, db_dict
+    print(db_dict,db_dt)
+    param_datetype = {row[1]: row[2] for row in item_list}
+    return db_dt, db_dict,param_datetype
 
 
 dblist = [elem for elem in dir(layouts) if "__" not in elem]
@@ -36,7 +48,6 @@ dblist = [elem for elem in dir(layouts) if "__" not in elem]
 db_nums = np.array([int(re.findall(pattern=r'\d+', string=db)[0]) for db in dblist])
 
 dbdict = {num : dbs for num,dbs in zip(db_nums,dblist)}
-print(dbdict)
 
 st.session_state["dblist_arr"] = np.array(dblist)
 select_db = st.selectbox("Select Database to read from", db_nums)
@@ -44,7 +55,7 @@ db = DB.DB()
 st.session_state["db"] = db
 
 layout = eval(dbdict[select_db] )
-dictionary, dt_dict = get_att(layout)
+dictionary, dt_dict,db.param_datetype = get_att(layout)
 db.layout = layout
 db.layout_dict = dictionary
 db.db_number = select_db
@@ -54,7 +65,6 @@ params = np.array([vals for vals in dictionary.values()])
 selected_params = st.multiselect("Select Params to track",params)
 ip = st.text_input("Put in the IP:",value="192.168.29.152")
 db.ip = str(ip)
-print(db.ip)
 db.keys = selected_params
 
 if "times" not in st.session_state:
@@ -101,7 +111,7 @@ placeholder = st.empty()
 fig_col1, fig_col2 = st.columns(2)
 
 if selected_params and st.session_state["con"]:
-    try:
+    #try:
         while True:
             with placeholder.container():
                 st.session_state["db"].get_data()
@@ -132,10 +142,14 @@ if selected_params and st.session_state["con"]:
                             value=st.session_state["db"].temp_dict[param][-1],
                         )
                 if selected_plots:
-                # Display selected plots
-                    fig_columns = st.columns(len(selected_plots))
+                    num_plots = len(selected_plots)
+                    num_columns = 4
+                    
+
+                    fig_columns = st.columns(num_columns)
+
                     for i, param in enumerate(selected_plots):
-                        with fig_columns[i]:
+                        with fig_columns[i % num_columns]:  # Ensure the plots are placed in the correct column
                             st.markdown(f"### {param}")
                             fig = px.line(data_frame=data, x="times", y=param)
                             st.write(fig)
@@ -156,9 +170,9 @@ if selected_params and st.session_state["con"]:
 
 
 
-    except Exception as e:
-        print(st.session_state)
-        st.session_state["df"].to_csv('output.csv', index=False)
-        print(e)
+    #except Exception as e:
+    #    print(st.session_state)
+    #    st.session_state["df"].to_csv('output.csv', index=False)
+    #    print(e)
 
 

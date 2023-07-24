@@ -5,6 +5,7 @@ from Snap7_Server.db_layout import *
 from snap7 import util
 import csv
 from datetime import datetime as dt
+from datetime import datetime
 
 
 class DB:
@@ -48,7 +49,7 @@ class DB:
         self.plc.connect(self.ip, 0, 1)
         self.db_number = int(self.db_number)
         all_data1 = self.plc.db_read(self.db_number, 0, size)
-
+        print(size,row_size)
         self.db = util.DB(db_number=self.db_number, bytearray_=all_data1,
                         specification=self.layout, row_size=row_size, size=1,
                         layout_offset=int(list(self.layout_dict.keys())[0]),
@@ -66,10 +67,25 @@ class DB:
         self.db.read(self.plc)
 
         for key in self.keys:
-            print(f'{key}: {self.db[0][key]}')
-            self.temp_dict[key].append(self.db[0][key])
+            print(self.dt_d)
+            # Check if the dtype is DTL (Date and Time)
+            if self.dt_dict[key] == "DTL":
+                # Get the raw timestamp value from the PLC
+                timestamp = self.db[0][key]
+
+                
+                
+
+                # Convert the PLC timestamp to a datetime object
+                datetime_value = datetime.fromtimestamp(timestamp)
+                self.temp_dict[key].append(datetime_value)
+            else:
+                # For other data types, append the value directly to temp_dict
+                self.temp_dict[key].append(self.db[0][key])
+        
         time.sleep(1)
         self.temp_dict = self.temp_dict
+        
 
 
     def save_params(self,name):
