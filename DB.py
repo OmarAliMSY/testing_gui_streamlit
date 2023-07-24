@@ -33,6 +33,7 @@ class DB:
         self.plc = None
         self.db  = None
         self.temp_dict = None
+
     def set_up(self):
 
         self.temp_dict = {k: [] for k in self.keys}
@@ -41,10 +42,12 @@ class DB:
             self.dt_dict[int(list(self.layout_dict.keys())[-1])]]
         size = int(list(self.layout_dict.keys())[-1]) + self.data_types[
             self.dt_dict[int(list(self.layout_dict.keys())[-1])]]
-
+        print(size)
         self.plc = snap7.client.Client()
+        print(self.db_number,type(self.db_number))
         self.plc.connect(self.ip, 0, 1)
-        all_data1 = self.plc.db_read(self.db_number, 0, 128)
+        self.db_number = int(self.db_number)
+        all_data1 = self.plc.db_read(self.db_number, 0, size)
 
         self.db = util.DB(db_number=self.db_number, bytearray_=all_data1,
                         specification=self.layout, row_size=row_size, size=1,

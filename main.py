@@ -32,37 +32,48 @@ def get_att(dbb_layout):
 
 
 dblist = [elem for elem in dir(layouts) if "__" not in elem]
-db_nums = [int(re.findall(pattern=r'\d+', string=db)[0]) for db in dblist]
+
+db_nums = np.array([int(re.findall(pattern=r'\d+', string=db)[0]) for db in dblist])
+
+dbdict = {num : dbs for num,dbs in zip(db_nums,dblist)}
+print(dbdict)
 
 st.session_state["dblist_arr"] = np.array(dblist)
-select_db = st.selectbox("Select Database to read from", st.session_state["dblist_arr"])
+select_db = st.selectbox("Select Database to read from", db_nums)
 db = DB.DB()
 st.session_state["db"] = db
 
-layout = eval(select_db )
+layout = eval(dbdict[select_db] )
 dictionary, dt_dict = get_att(layout)
 db.layout = layout
 db.layout_dict = dictionary
-
-db.db_number = int(re.findall(pattern=r'\d+', string=select_db )[0])
+db.db_number = select_db
+#db.db_number = int(re.findall(pattern=r'\d+', string=select_db )[0])
 db.dt_dict = dt_dict
 params = np.array([vals for vals in dictionary.values()])
 selected_params = st.multiselect("Select Params to track",params)
-ip = st.text_input("Put in the IP:",placeholder="192.168.29.152")
-db.ip = "192.168.29.152"
+ip = st.text_input("Put in the IP:",value="192.168.29.152")
+db.ip = str(ip)
+print(db.ip)
 db.keys = selected_params
+
+if "times" not in st.session_state:
+    st.session_state["times"] = []
+
+
+
+# Multiselect box to select plots
+selected_plots = st.multiselect("Select Plots to Show", selected_params,key="sp")
+
+# Multiselect box to select values
+selected_values = st.multiselect("Select Values to Show", selected_params,key="sv")
 if st.checkbox('Connect',key="con"):
-    st.session_state["db"] .set_up()
 
-print(st.session_state)
-t = st.select_slider("Select Time",options=np.arange(1,5000+1,1),value=100)
-#start = st.radio("Start",options=["Yes","No"],index=1)
-temp = 0
-
-
+    st.session_state["db"].set_up()
 def convert_df(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
     return df.to_csv().encode('utf-8')
+
 if "df" not in st.session_state:
     st.session_state["df"] = None
 
@@ -82,7 +93,6 @@ line, = ax.plot([], [])
 
 # Create an initial empty line
 
-# ... Existing code ...
 
 # creating a single-element container
 placeholder = st.empty()
@@ -90,68 +100,64 @@ placeholder = st.empty()
 
 fig_col1, fig_col2 = st.columns(2)
 
-# near real-time / live feed simulation
 if selected_params and st.session_state["con"]:
     try:
         while True:
             with placeholder.container():
                 st.session_state["db"].get_data()
 
-                kpi1, kpi2, kpi3 ,kpi4= st.columns(4)
+                
+                current_time = time.time()
 
-                kpi1.metric(
-                    label="maxLastMotorTorque",
-                    value=st.session_state["db"].temp_dict["maxLastMotorTorque"][-1],
-                )
+                # Convert the Unix timestamp to a formatted time string
+                formatted_time = time.strftime("%H:%M:%S", time.localtime(current_time))
 
-                kpi2.metric(
-                    label="statusNumber",
-                    value=st.session_state["db"].temp_dict["statusNumber"][-1],
-                )
+                # Append the formatted time to the list
+                st.session_state["times"].append(formatted_time)
 
-                kpi3.metric(
-                    label="TiltTwistAngle",
-                    value=st.session_state["db"].temp_dict["TiltTwistAngle"][-1],
-                )
-                kpi4.metric(
-                    label="southSensorAngle",
-                    value=st.session_state["db"].temp_dict["southSensorAngle"][-1],
-                )
-
-                x_data = np.linspace(
-                    1,
-                    len(st.session_state["db"].temp_dict["maxLastMotorTorque"]),
-                    len(st.session_state["db"].temp_dict["maxLastMotorTorque"]),
-                        )
-
+                # Update the x-axis data with the new list of formatted times
+                x_data= st.session_state["times"]
                 data = pd.DataFrame(
-                {'x_column': x_data, **{param: st.session_state["db"].temp_dict[param] for param in selected_params}})
-
+                {'times': x_data, **{param: st.session_state["db"].temp_dict[param] for param in selected_params}})
+                data.set_index("times")
                 st.session_state["df"] = data
 
-                fig_col1, fig_col2 = st.columns(2)
-                with fig_col1:
-                    st.markdown("###  maxLastMotorTorque")
-                    fig2 = px.scatter(data_frame=data, x="x_column",y="maxLastMotorTorque")
-                    st.write(fig2)
-                with fig_col2:
-                    st.markdown("### southSensorAngle")
-                    fig1 = px.scatter(data_frame=data, x="x_column",y="southSensorAngle")
-                    st.write(fig1)
+                if selected_values:
 
+                # Display selected values
+                    kpi_columns = st.columns(len(selected_values))
+                    for i, param in enumerate(selected_values):
+                        kpi_columns[i].metric(
+                            label=param,
+                            value=st.session_state["db"].temp_dict[param][-1],
+                        )
+                if selected_plots:
+                # Display selected plots
+                    fig_columns = st.columns(len(selected_plots))
+                    for i, param in enumerate(selected_plots):
+                        with fig_columns[i]:
+                            st.markdown(f"### {param}")
+                            fig = px.line(data_frame=data, x="times", y=param)
+                            st.write(fig)
+
+                
 
                 if st.session_state["df"] is not None:
+                    current_time = time.time()
+
+                    # Convert the Unix timestamp to a formatted time string
+                    formatted_time = time.strftime("%H:%M:%S", time.localtime(current_time))
                     st.download_button(
                         label="Download data as CSV",
                         data=convert_df(st.session_state["df"]),
-                        file_name='large_df.csv',
+                        file_name=str(formatted_time)+".csv",
                         mime='text/csv',
                     )
 
 
 
     except Exception as e:
-
+        print(st.session_state)
         st.session_state["df"].to_csv('output.csv', index=False)
         print(e)
 
