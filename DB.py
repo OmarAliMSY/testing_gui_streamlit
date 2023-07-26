@@ -8,6 +8,7 @@ from datetime import datetime as dt
 from datetime import datetime
 from glob import glob
 from utils import get_unique_filename
+import os
 class DB:
     """
     Class representing a database.
@@ -94,13 +95,13 @@ class DB:
         filenamecsv = get_unique_filename(name, date, data="csv")
         filenamejson = get_unique_filename(name, date, data="json")
         print(filenamecsv)
-    
-        with open(filenamecsv, 'w') as f:
+        path = r"C:\Users\o.abdulmalik\OneDrive - Mounting Systems\Freigegebene Dokumente - PM Projects\Development\TRK_2110_Linear_Actuator"
+        with open(os.path.join(path,filenamecsv), 'w') as f:
             print("created new file")
             w = csv.DictWriter(f, self.temp_dict.keys())
             w.writeheader()
             w.writerow(self.temp_dict)
-    
-        with open(filenamejson, 'w') as json_file:
+
+        with open(os.path.join(path,filenamejson), 'w') as json_file:
             json.dump(meta_dict, json_file, indent=4)  # 'indent=4' is optional for pretty formatting
 
