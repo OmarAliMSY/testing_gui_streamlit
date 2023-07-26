@@ -6,8 +6,8 @@ from snap7 import util
 import csv
 from datetime import datetime as dt
 from datetime import datetime
-
-
+from glob import glob
+from utils import get_unique_filename
 class DB:
     """
     Class representing a database.
@@ -24,32 +24,33 @@ class DB:
 
     def __init__(self):
         self.ip = None
-        self.temp_dict = {}
         self.layout = None
         self.layout_dict = {}
         self.db_number = None
         self.dt_dict = {}
         self.data_types = {"USINT": 1, "BOOL": 2, "REAL": 4, "DTL": 12, "INT": 2}
-        self.keys = None
+        self.keys = []
         self.plc = None
         self.db  = None
-        self.temp_dict = None
+        self.temp_dict = {}
+        self.param_datetype = None
+        self.times = []
+        self.temp_dict = {}
+
+
 
     def set_up(self):
-
-        self.temp_dict = {k: [] for k in self.keys}
+        print("Setting up")
+        
         print(f'Connecting to: {self.ip,self.db_number}')
         row_size = int(list(self.layout_dict.keys())[-1]) - int(list(self.layout_dict.keys())[0]) + self.data_types[
             self.dt_dict[int(list(self.layout_dict.keys())[-1])]]
         size = int(list(self.layout_dict.keys())[-1]) + self.data_types[
             self.dt_dict[int(list(self.layout_dict.keys())[-1])]]
-        print(size)
         self.plc = snap7.client.Client()
-        print(self.db_number,type(self.db_number))
         self.plc.connect(self.ip, 0, 1)
         self.db_number = int(self.db_number)
         all_data1 = self.plc.db_read(self.db_number, 0, size)
-        print(size,row_size)
         self.db = util.DB(db_number=self.db_number, bytearray_=all_data1,
                         specification=self.layout, row_size=row_size, size=1,
                         layout_offset=int(list(self.layout_dict.keys())[0]),
@@ -63,38 +64,43 @@ class DB:
         - interval (int): Time interval between data reads.
         - t (int): Number of data readings to perform.
         """
-        print(self.layout_dict)
         self.db.read(self.plc)
+        current_time = time.time()
 
+        # Convert the Unix timestamp to a formatted time string
+        formatted_time = time.strftime("%H:%M:%S", time.localtime(current_time))
+
+        # Append the formatted time to the list
+        
+
+        # Update the x-axis data with the new list of formatted times
+        
         for key in self.keys:
-            print(self.dt_d)
-            # Check if the dtype is DTL (Date and Time)
-            if self.dt_dict[key] == "DTL":
-                # Get the raw timestamp value from the PLC
-                timestamp = self.db[0][key]
+            self.temp_dict[key].append(self.db[0][key])
 
-                
-                
+        self.times.append(formatted_time)
 
-                # Convert the PLC timestamp to a datetime object
-                datetime_value = datetime.fromtimestamp(timestamp)
-                self.temp_dict[key].append(datetime_value)
-            else:
-                # For other data types, append the value directly to temp_dict
-                self.temp_dict[key].append(self.db[0][key])
+
         
         time.sleep(1)
-        self.temp_dict = self.temp_dict
         
 
 
-    def save_params(self,name):
+    def save_params(self, name, meta_dict):
         """
         Save parameters to a CSV file with the current date as the filename.
         """
         date = dt.today().strftime('%Y-%m-%d')
-
-        with open(name +date + '.csv', 'w') as f:
+        filenamecsv = get_unique_filename(name, date, data="csv")
+        filenamejson = get_unique_filename(name, date, data="json")
+        print(filenamecsv)
+    
+        with open(filenamecsv, 'w') as f:
+            print("created new file")
             w = csv.DictWriter(f, self.temp_dict.keys())
             w.writeheader()
             w.writerow(self.temp_dict)
+    
+        with open(filenamejson, 'w') as json_file:
+            json.dump(meta_dict, json_file, indent=4)  # 'indent=4' is optional for pretty formatting
+
