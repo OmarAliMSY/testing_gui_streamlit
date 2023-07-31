@@ -8,12 +8,11 @@ import plotly.express as px
 import pandas as pd
 from db_layout import *
 from utils import get_att
-import json
 from datetime import datetime
 
 st.set_page_config(
     page_title="Data aquisition",
-    page_icon="🧊",
+    page_icon=r"favicon.ico",
     layout="wide",
     initial_sidebar_state="expanded",
     menu_items={
