@@ -69,9 +69,12 @@ if "test_name" not in st.session_state:
 selected_plots = st.multiselect("Select Plots to Show", selected_params,key="sp")
 selected_values = st.multiselect("Select Values to Show", selected_params,key="sv")
 
+def init_setup():
+        st.session_state["db"].set_up()
+
 st.session_state["test_name"] = testname
 if st.checkbox('Connect',key="con") and st.session_state["temp"] == False:
-    st.session_state["db"].set_up()
+    init_setup()
     
 
 if "df" not in st.session_state:
@@ -106,8 +109,8 @@ def onClickFunction(name):
 st.session_state["db"] = db
 
 placeholder = st.empty()
-st.cache_data
 
+@st.cache_data
 def convert_df(df):
     # IMPORTANT: Cache the conversion to prevent computation on every rerun
     return df.to_csv().encode('utf-8')
@@ -153,7 +156,7 @@ if selected_params and st.session_state["con"]:
                             st.markdown(f"### {param}")
                             fig = px.line(data_frame=data, x="times", y=param)
                             st.write(fig)
-                
+                st.write(db.times[-1])
             if save_button:
                 onClickFunction(testname)
                 
