@@ -95,7 +95,7 @@ class DB:
         filenamecsv = get_unique_filename(name, date, data="csv")
         filenamejson = get_unique_filename(name, date, data="json")
         print(filenamecsv)
-        path = r"C:\Users\o.abdulmalik\OneDrive - Mounting Systems\Freigegebene Dokumente - PM Projects\Development\TRK_2110_Linear_Actuator"
+        path = r"C:\Users\o.abdulmalik\OneDrive - Mounting Systems\Freigegebene Dokumente - PM Projects\Development\TRK_2110_Linear_Actuator\05 Testing"
         with open(os.path.join(path,filenamecsv), 'w') as f:
             print("created new file")
             w = csv.DictWriter(f, self.temp_dict.keys())

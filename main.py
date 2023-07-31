@@ -27,7 +27,7 @@ if "temp" not in st.session_state:
     st.session_state["temp"] = False
 
 
-st.header('DAQ')
+st.header('Testing')
 
 dblist = [elem for elem in dir(layouts) if "__" not in elem]
 db_nums = np.array([int(re.findall(pattern=r'\d+', string=db)[0]) for db in dblist])
