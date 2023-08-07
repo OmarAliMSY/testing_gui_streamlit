@@ -5,10 +5,9 @@ from Snap7_Server.db_layout import *
 from snap7 import util
 import csv
 from datetime import datetime as dt
-from datetime import datetime
-from glob import glob
 from utils import get_unique_filename
 import os
+
 class DB:
     """
     Class representing a database.

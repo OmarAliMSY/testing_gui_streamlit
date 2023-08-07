@@ -1,8 +1,4 @@
-import DB
-import re
-import db_layout as layouts
 from db_layout import *
-import numpy as np
 from glob import glob
 
 
