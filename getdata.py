@@ -6,6 +6,7 @@ from datetime import datetime
 import os
 import csv 
 import json
+import time
 
 db103 = DB()
 db103.db_number = 103
@@ -36,7 +37,8 @@ if not os.path.isfile(os.path.join(path, filenamecsv)):
 
 with open(os.path.join(path, filenamejson), 'w') as json_file:
     json.dump(data_dict, json_file, indent=4)  # 'indent=4' is op1tional for pretty formatting
-
+i = 0
+max_attempts = 10
 while True:
     try:
         print(db103.temp_dict)
@@ -45,19 +47,28 @@ while True:
         db103.temp_dict["times"]  = db103.times
         # Create a new dictionary with the last values of each key
         last_data = {key: value[-1] for key, value in db103.temp_dict.items()}
-        
 
         if i % 5 == 0:
             db103.temp_dict = {key: [] for key in db103.temp_dict.keys()}
+            max_attempts = 10
         # Write the last data row to the CSV file
-        with open(os.path.join(path, filenamecsv), 'a',newline='') as f:
+        with open(os.path.join(path, filenamecsv), 'a', newline='') as f:
             w = csv.DictWriter(f, db103.temp_dict.keys())
             w.writerow(last_data)
 
-    except KeyboardInterrupt:
-        print('Interrupted')
-        break
 
     except Exception as e:
-        print(e)
-        continue
+        try:
+            if max_attempts > 0:
+                db103.set_up()
+                max_attempts -= 1
+                time.sleep(1)       # Delay before retrying
+                continue
+        except Exception as f:
+            time.sleep(1)
+            max_attempts -= 1
+            continue
+        else:
+            print('Failed to connect to the database after multiple attempts.')
+            break
+
