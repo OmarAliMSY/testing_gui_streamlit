@@ -68,7 +68,8 @@ class DB:
         current_time = time.time()
 
         # Convert the Unix timestamp to a formatted time string
-        formatted_time = time.strftime("%H:%M:%S", time.localtime(current_time))
+        formatted_time = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(current_time))
+
 
         # Append the formatted time to the list
         

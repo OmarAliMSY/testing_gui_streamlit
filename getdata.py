@@ -37,7 +37,6 @@ if not os.path.isfile(os.path.join(path, filenamecsv)):
 
 with open(os.path.join(path, filenamejson), 'w') as json_file:
     json.dump(data_dict, json_file, indent=4)  # 'indent=4' is op1tional for pretty formatting
-i = 0
 max_attempts = 10
 while True:
     try:
@@ -50,6 +49,7 @@ while True:
 
         if i % 5 == 0:
             db103.temp_dict = {key: [] for key in db103.temp_dict.keys()}
+            db103.times = []
             max_attempts = 10
         # Write the last data row to the CSV file
         with open(os.path.join(path, filenamecsv), 'a', newline='') as f:
