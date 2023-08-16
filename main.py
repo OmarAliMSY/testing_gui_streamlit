@@ -91,7 +91,7 @@ if "df" not in st.session_state:
     st.session_state["df"] = data
 
 # Display title
-st.title(f"Tracking DB: {db.db_number}")
+st.title(f"Tracking DB: {db.db_number} at IP: {db.ip}")
 
 # Initialize plot
 if "fig" not in st.session_state:
@@ -123,21 +123,15 @@ st.session_state["db"] = db
 
 placeholder = st.empty()
 
-# Convert DataFrame to CSV data
-
-
-
-
 path = "csv_data"
 filenamecsv = st.session_state["test_name"] + ".csv"
 filenamejson = st.session_state["test_name"] + ".json"
 
 
-
-# Download CSV button
-
 max_attempts = 10
 n = 0
+current_time = time.time()
+
 if selected_params and st.session_state["con"]:
     if "init" not in st.session_state:
         if not os.path.isfile(os.path.join(path, filenamecsv)):
@@ -146,16 +140,16 @@ if selected_params and st.session_state["con"]:
                 print("created new file")
                 w = csv.DictWriter(f, db.temp_dict.keys())
                 w.writeheader()
-        data_dict = {
-            "testname": st.session_state["test_name"],
-            "Date": datetime.timestamp(datetime.now()),
-            "parameters": st.session_state["tracking_params"],
-            "ip": db.ip,
-            "DB-Number": f"{db.db_number}"
-        }
+            data_dict = {
+                "testname": st.session_state["test_name"],
+                "Date": time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(current_time)),
+                "parameters": st.session_state["tracking_params"],
+                "ip": db.ip,
+                "DB-Number": f"{db.db_number}"
+            }
 
-        with open(os.path.join(path, filenamejson), 'w') as json_file:
-            json.dump(data_dict, json_file, indent=4)
+            with open(os.path.join(path, filenamejson), 'w') as json_file:
+                json.dump(data_dict, json_file, indent=4)
 
             
         different_button = st.download_button(
@@ -173,10 +167,11 @@ if selected_params and st.session_state["con"]:
                 if n % 5 == 0:
                     db.temp_dict = {key: [] for key in db.temp_dict.keys()}
                     db.times = []
-                    max_attempts = 10
+                    
                 db.get_data()
                 db.temp_dict["times"] = db.times
-                last_data = {key: value[-1] for key, value in db.temp_dict.items()}
+                print(db.temp_dict)
+                last_data = {key: value[-1] for key , value in db.temp_dict.items() if value}
                 print(n)
                 
                 with open(os.path.join(path, filenamecsv), 'a', newline='') as f:
@@ -208,19 +203,24 @@ if selected_params and st.session_state["con"]:
                     onClickFunction(testname)
                     save_button = False
                     print(st.session_state)
+                if n %10 == 0:
+                    max_attempts = 10
 
         except Exception as e:
             try:
-                if max_attempts > 0:
-                    print(e)
                     db.set_up()
-                    max_attempts -= 1
-                    continue
+                    print(e)
             except Exception as f:
                 with st.spinner('Reconnecting'):
+                    print(max_attempts)
+
                     time.sleep(2)
                 max_attempts -= 1
-                continue
-            else:
-                st.warning(f'Failed to connect to the database after multiple attempts.{f}')
-                break
+                if max_attempts <= 0:
+                    st.warning("Too many attemps, stopped loop!")
+                    break
+
+
+                    
+
+
