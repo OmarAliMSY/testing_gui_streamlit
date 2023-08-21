@@ -9,8 +9,8 @@ print(len(df["times"]),len(df["times"])/3600/24)
 
 
 # Plot the columns
-df.plot(x="times", y=["northSensorAngle", "southSensorAngle", "TiltSetAngle"], ax=ax)
-df.plot(x="times", y="maxLastMotorTorque", secondary_y=True, ax=ax, color="blue")
+df.plot(x="times", y=["northSensorAngle", "southSensorAngle", "TiltSetAngle"], ax=ax,ylabel="Angle in [°]")
+df.plot(x="times", y="maxLastMotorTorque", secondary_y=True, ax=ax, color="blue",ylabel="Torque in [%]")
 
 # Adjust x-axis labels
 num_ticks = 10  # You can adjust the number of ticks as needed
