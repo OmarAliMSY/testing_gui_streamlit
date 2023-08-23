@@ -4,33 +4,85 @@
 \usepackage{lmodern}%
 \usepackage{textcomp}%
 \usepackage{lastpage}%
+\usepackage{geometry}%
+\geometry{head=40pt,margin=1.0in,bottom=0.6in,includeheadfoot=True}%
 \usepackage{graphicx}%
+\usepackage{hyperref}%
+\usepackage{fancyhdr}%
 %
-\title{}%
-\author{}%
-\date{2023{-}08{-}21}%
+\fancypagestyle{header}{%
+\renewcommand{\headrulewidth}{0pt}%
+\renewcommand{\footrulewidth}{0pt}%
+\fancyhead{%
+}%
+\fancyfoot{%
+}%
+\renewcommand{\headrulewidth}{0.5pt}%
+\renewcommand{\footrulewidth}{0.5pt}%
+\fancyhead[L]{%
+}%
+\fancyhead[L]{%
+\nouppercase{\leftmark}%
+}%
+\fancyhead[R]{%
+\includegraphics[height=1cm]{MSG-Signet-Schwarz-CMYK-170414-02.png}%
+}%
+\fancyfoot[R]{%
+\thepage%
+}%
+\fancyfoot[L]{%
+2023{-}08{-}23%
+}%
+\fancyfoot[C]{%
+Gleitlagertest%
+}%
+}%
+\hypersetup{colorlinks=true,citecolor=black,filecolor=black,linkcolor=black,menucolor=black,urlcolor=black}%
+\title{Gleitlagertest}%
+\author{Omar}%
+\date{2023{-}08{-}23}%
 %
 \begin{document}%
 \normalsize%
-\maketitle%
+\pagestyle{header}%
+
+\begin{titlepage}
+    \begin{minipage}[t][4cm][l]{0.4\textwidth}
+        \includegraphics[width=75px]{MSG-Signet-Schwarz-CMYK-170414-02.png}
+    \end{minipage}
+    \hspace{2cm}
+    \begin{minipage}[t][4cm][t]{0.4\textwidth}
+        \includegraphics[width=150px]{MSG-Signet-Schwarz-CMYK-170414-01.png}
+    \end{minipage}
+    \begin{center}
+    \begin{Huge}
+        \textbf{Testbericht}\\
+          
+        
+        \end{Huge}
+        
+    \vspace{3cm}
+    \large{Versuchsprotokoll} \\
+    \vspace{2cm}
+    \large
+    \begin{tabular}{| p{0.4\textwidth} | p{0.4\textwidth}|}
+        \hline
+        %    Versuch Nr.: &  \\ \hline
+            Versuch & Gleitlagertest\\  \hline
+        %     Projekt & \\\hline 
+             Bauteil  & Gleitlager  \\ \hline
+             Datum & 2023-08-23\\ \hline
+             Pruefer & Omar\\ \hline
+             
+    \end{tabular}
+\end{center}
+\end{titlepage}
+%
 \newpage%
 \tableofcontents%
 \newpage%
 \section{Testaufbau}%
 \label{sec:Testaufbau}%
-
-%
-\subsection{}%
-\label{subsec:}%
-
-%
-
-
-\begin{figure}[h!]%
-\centering%
-\includegraphics[width=360px]{imgta0_0.png}%
-\caption{}%
-\end{figure}
 
 %
 \newpage%
