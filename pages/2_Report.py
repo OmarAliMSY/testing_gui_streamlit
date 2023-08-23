@@ -5,7 +5,16 @@ from pylatex.utils import bold, NoEscape,escape_latex
 import streamlit as st
 from PIL import Image
 import os
-
+st.set_page_config(
+    page_title="Data Acquisition",
+    page_icon=r"favicon.ico",
+    layout="wide",
+    initial_sidebar_state="expanded",
+    menu_items={
+        'Get Help': 'https://www.extremelycoolapp.com/help',
+        'Report a bug': "https://www.extremelycoolapp.com/bug",
+        'About': "# This is a header. This is an *extremely* cool app!"
+    })
 # Initialize session state for each section's subsections and images
 if "subsections_ta" not in st.session_state:
     st.session_state["subsections_ta"] = []
@@ -88,11 +97,14 @@ class MyDoc:
                 kitten_pic.add_caption(caption)
 
 path_pdf = "pdf_files/"
+c1,c2 = st.columns(2)
+with c1: 
+    author = st.text_input("Author:")
+    date = st.date_input("Date")
+with c2: 
 
-author = st.text_input("Author:")
-date = st.date_input("Date")
-tite = st.text_input("Title:")
-bauteil = st.text_input("Bauteil:")
+    tite = st.text_input("Title:")
+    bauteil = st.text_input("Bauteil:")
 
 
 mydoc = MyDoc()
@@ -130,6 +142,7 @@ mydoc.doc.preamble.append(Command('author', author))
 mydoc.doc.preamble.append(Command('date', date))
 mydoc.title_page(author=author, date=date, title=tite,bauteil=bauteil)
 
+t1,t2 = st.columns(2)
 
 ta = st.container()
 tb = st.container()
@@ -137,9 +150,22 @@ durch = st.container()
 aus = st.container()
 
 
+
 with ta:
     st.header("Testaufbau")
     mydoc.section(i="ta",title="Testaufbau",label="Testaufbau")
+    # Add the option to add images to the section
+    if st.button("Add Image to Section", key="add_image_ta"):
+        st.session_state["figs_ta"].append({
+        "caption": ""
+    })
+    # Display the images added to the section
+    for i, image in enumerate(st.session_state["figs_ta"]):
+        caption = st.text_input(f"Caption for Image {i+1}", value=image["caption"], key=f"im_caption_ta_{i}")
+        st.session_state["figs_ta"][i]["caption"] = caption
+        mydoc.fig(i=f"ta_{i}{image}", caption=caption)
+
+
     if st.button("Add Subsection", key="asta"):
         st.session_state["subsections_ta"].append({
             "title": "",
@@ -164,12 +190,30 @@ with ta:
             subsection["images"][j]["caption"] = caption
 
             mydoc.fig(i=f"ta{i}_{j}", caption=caption)  # Call mydoc.fig for the added image
+        choice_indices = st.multiselect(options=list(range(len(st.session_state["subsections_ta"]))), label="Select subsections to remove",key="msta")
+        remove_button3 = st.button("Remove", key="remove_data_ta")
+
+        if remove_button3:
+            st.session_state["subsections_ta"] = [subsection for i, subsection in enumerate(st.session_state["subsections_ta"]) if i not in choice_indices]
+            remove_button = False
+        print(st.session_state["subsections_ta"])
 mydoc.doc.append(NoEscape(r'\newpage'))
 
 with tb:
     st.header("Testbeschreibung")
 
     mydoc.section(i="tb", title="Testbeschreibung", label="Testbeschreibung")
+    if st.button("Add Image to Section", key="add_image_tb"):
+        st.session_state["figs_tb"].append({
+        "caption": ""
+        })
+
+    # Display the images added to the section
+    for i, image in enumerate(st.session_state["figs_tb"]):
+        caption = st.text_input(f"Caption for Image {i+1}", value=image["caption"], key=f"im_caption_tb_{i}")
+        st.session_state["figs_tb"][i]["caption"] = caption
+        mydoc.fig(i=f"ta_{i}", caption=caption)
+
     if st.button("Add Subsection", key="astb"):
         st.session_state["subsections_tb"].append({
             "title": "",
@@ -193,14 +237,28 @@ with tb:
             caption = st.text_input(f"Caption {j+1} Title", value=image["caption"], key=f"tbim_title_tb_{i}_{j}")
             subsection["images"][j]["caption"] = caption
             mydoc.fig(i=f"tb{i}_{j}", caption=caption)
-            
+        choice_indices = st.multiselect(options=list(range(len(st.session_state["subsections_tb"]))), label="Select subsections to remove",key="mstb")
+        remove_button2 = st.button("Remove", key="remove_data_tb")
+
+        if remove_button2:
+            st.session_state["subsections_tb"] = [subsection for i, subsection in enumerate(st.session_state["subsections_tb"]) if i not in choice_indices]
+            remove_button = False
+        print(st.session_state["subsections_tb"])
 mydoc.doc.append(NoEscape(r'\newpage'))
 
 
 with durch:
     st.header("Durchführung")
     mydoc.section(i="du", title="Durchführung", label="Durchführung")
-
+    if st.button("Add Image to Section", key="add_image_durch"):
+        st.session_state["figs_durch"].append({
+        "caption": ""
+        })
+    # Display the images added to the section
+    for i, image in enumerate(st.session_state["figs_durch"]):
+        caption = st.text_input(f"Caption for Image {i+1}", value=image["caption"], key=f"im_caption_durch_{i}")
+        st.session_state["figs_durch"][i]["caption"] = caption
+        mydoc.fig(i=f"durch_{i}", caption=caption)
     if st.button("Add Subsection", key="asdurch"):
         st.session_state["subsections_durch"].append({
             "title": "",
@@ -225,17 +283,31 @@ with durch:
             subsection["images"][j]["caption"] = caption
             mydoc.fig(i=f"durch{i}_{j}", caption=caption)
 
+        choice_indices = st.multiselect(options=list(range(len(st.session_state["subsections_durch"]))), label="Select subsections to remove",key="msdurch")
+        remove_button1 = st.button("Remove", key="remove_data_durch")
+
+        if remove_button1:
+            st.session_state["subsections_durch"] = [subsection for i, subsection in enumerate(st.session_state["subsections_durch"]) if i not in choice_indices]
+            remove_button = False
+        print(st.session_state["subsections_durch"])
 mydoc.doc.append(NoEscape(r'\newpage'))
 
 
 with aus:
     st.header("Auswertung")
     mydoc.section(i="aus", title="Auswertung", label="Auswertung")
-
+    if st.button("Add Image to Section", key="add_image_aus"):
+        st.session_state["figs_aus"].append({
+        "caption": ""
+        })
+    # Display the images added to the section
+    for i, image in enumerate(st.session_state["figs_aus"]):
+        caption = st.text_input(f"Caption for Image {i+1}", value=image["caption"], key=f"im_caption_aus_{i}")
+        st.session_state["figs_aus"][i]["caption"] = caption
+        mydoc.fig(i=f"aus_{i}", caption=caption)
     if st.button("Add Subsection", key="asaus"):
         st.session_state["subsections_aus"].append({
             "title": "",
-            "content": "",
             "images": []
         })
 
@@ -256,19 +328,35 @@ with aus:
             subsection["images"][j]["caption"] = caption
             mydoc.fig(i=f"aus{i}_{j}", caption=caption)
 
-mydoc.doc.append(NoEscape(r'\newpage'))
-save_button = st.button("Compile", key="save_data")
+    choice_indices = st.multiselect(options=list(range(len(st.session_state["subsections_aus"]))), label="Select subsections to remove")
+    remove_button = st.button("Remove", key="aus_remove_data")
 
-if save_button:
-    with st.spinner('Compiling...'):
-        mydoc.doc.generate_pdf(path_pdf + 'Test_Report', clean_tex=False)
-        st.success('Done!')
+    if remove_button:
+        st.session_state["subsections_aus"] = [subsection for i, subsection in enumerate(st.session_state["subsections_aus"]) if i not in choice_indices]
+        remove_button = False
+    print(st.session_state["subsections_aus"])
+    mydoc.doc.append(NoEscape(r'\newpage'))
 
-    tex = mydoc.doc.dumps()  # The document as string in LaTeX syntax
-    with open("pdf_files/Test_Report.pdf", "rb") as pdf_file:
-        PDFbyte = pdf_file.read()
 
-    st.download_button(label="Download PDF",
-                       data=PDFbyte,
-                       file_name=f"{tite}.pdf",
-                       mime='application/octet-stream')
+
+
+
+_,_,c,_ = st.columns(4)
+
+with c :
+    save_button = st.button("Compile", key="save_data")
+
+
+    if save_button:
+        with st.spinner('Compiling...'):
+            mydoc.doc.generate_pdf(path_pdf + 'Test_Report', clean_tex=False)
+            st.success('Done!')
+
+        tex = mydoc.doc.dumps()  # The document as string in LaTeX syntax
+        with open("pdf_files/Test_Report.pdf", "rb") as pdf_file:
+            PDFbyte = pdf_file.read()
+
+        st.download_button(label="Download PDF",
+                            data=PDFbyte,
+                            file_name=f"{tite}.pdf",
+                            mime='application/octet-stream')
