@@ -26,6 +26,7 @@ st.set_page_config(
         'About': "# This is a header. This is an *extremely* cool app!"
     })
 
+
 # Initialize session_state
 if "temp" not in st.session_state:
     st.session_state["temp"] = False
@@ -61,7 +62,7 @@ if selected_params:
     db.keys = selected_params
     db.temp_dict.update({k: [] for k in db.keys if k not in db.temp_dict.keys()})
     st.session_state["tracking_params"] = selected_params
-
+selected_params = st.session_state["tracking_params"]
 ip = st.text_input("Put in the IP:", value="192.168.29.152")
 db.ip = str(ip)
 db.keys = selected_params
@@ -73,12 +74,13 @@ if "test_name" not in st.session_state:
     st.session_state["test_name"] = ""
 
 # Select plots and values
-selected_plots = st.multiselect("Select Plots to Show", selected_params, key="sp")
-selected_values = st.multiselect("Select Values to Show", selected_params, key="sv")
+selected_plots = st.multiselect("Select Plots to Show", st.session_state["tracking_params"], key="sp")
+selected_values = st.multiselect("Select Values to Show", st.session_state["tracking_params"], key="sv")
 
 # Initialize database setup
 def init_setup():
     st.session_state["db"].set_up()
+st.write(st.session_state["db"].plc)
 
 # Set test name and initiate setup
 st.session_state["test_name"] = testname
@@ -170,15 +172,13 @@ if selected_params and st.session_state["con"]:
                     
                 db.get_data()
                 db.temp_dict["times"] = db.times
-                print(db.temp_dict)
                 last_data = {key: value[-1] for key , value in db.temp_dict.items() if value}
-                print(n)
                 
                 with open(os.path.join(path, filenamecsv), 'a', newline='') as f:
                     w = csv.DictWriter(f, db.temp_dict.keys())
                     w.writerow(last_data)
 
-                if selected_values:
+                if st.session_state["sv"]:
                     kpi_columns = st.columns(len(selected_values))
                     for i, param in enumerate(selected_values):
                         kpi_columns[i].metric(
@@ -186,7 +186,7 @@ if selected_params and st.session_state["con"]:
                             value=db.temp_dict[param][-1],
                         )
 
-                if selected_plots:
+                if st.session_state["sp"]:
                     num_plots = len(selected_plots)
                     num_columns = 4
                     fig_columns = st.columns(num_columns)

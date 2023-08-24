@@ -92,17 +92,18 @@ class MyDoc:
             image_path = f"img{i}.png"
             
             
-            with self.doc.create(Figure(position='h!')) as kitten_pic:
-                kitten_pic.add_image(image_path, width=NoEscape(f"{scale}"+r"\textwidth"))
-                kitten_pic.add_caption(caption)
+            with self.doc.create(Figure(position='h!')) as pic:
+                pic.add_image(image_path, width=NoEscape(f"{scale}"+r"\textwidth"))
+                pic.add_caption(caption)
+
 
 path_pdf = "pdf_files/"
+
 c1,c2 = st.columns(2)
 with c1: 
     author = st.text_input("Author:")
     date = st.date_input("Date")
 with c2: 
-
     tite = st.text_input("Title:")
     bauteil = st.text_input("Bauteil:")
 
@@ -121,11 +122,10 @@ with header.create(Head("L")):
 # Create right header
 with header.create(Head("R")):
     header.append(StandAloneGraphic(filename=r"MSG-Signet-Schwarz-CMYK-170414-02.png",image_options="height=1cm"))
-# Create left footer
+# Create right footer
 with header.create(Foot("R")):
     header.append(NoEscape( r'\thepage'))
-
-# Create center footer
+# Create left footer
 with header.create(Foot("L")):
     header.append(str(date))
 # Create right footer
@@ -190,18 +190,18 @@ with ta:
             subsection["images"][j]["caption"] = caption
 
             mydoc.fig(i=f"ta{i}_{j}", caption=caption)  # Call mydoc.fig for the added image
-        choice_indices = st.multiselect(options=list(range(len(st.session_state["subsections_ta"]))), label="Select subsections to remove",key="msta")
-        remove_button3 = st.button("Remove", key="remove_data_ta")
+    choice_indices = st.multiselect(options=list(range(len(st.session_state["subsections_ta"]))), label="Select subsections to remove",key="msta")
+    remove_button3 = st.button("Remove", key="remove_data_ta")
 
-        if remove_button3:
-            st.session_state["subsections_ta"] = [subsection for i, subsection in enumerate(st.session_state["subsections_ta"]) if i not in choice_indices]
-            remove_button = False
-        print(st.session_state["subsections_ta"])
+    if remove_button3:
+        st.session_state["subsections_ta"] = [subsection for i, subsection in enumerate(st.session_state["subsections_ta"]) if i not in choice_indices]
+        remove_button = False
+    print(st.session_state["subsections_ta"])
 mydoc.doc.append(NoEscape(r'\newpage'))
+
 
 with tb:
     st.header("Testbeschreibung")
-
     mydoc.section(i="tb", title="Testbeschreibung", label="Testbeschreibung")
     if st.button("Add Image to Section", key="add_image_tb"):
         st.session_state["figs_tb"].append({
@@ -243,7 +243,7 @@ with tb:
         if remove_button2:
             st.session_state["subsections_tb"] = [subsection for i, subsection in enumerate(st.session_state["subsections_tb"]) if i not in choice_indices]
             remove_button = False
-        print(st.session_state["subsections_tb"])
+
 mydoc.doc.append(NoEscape(r'\newpage'))
 
 
@@ -254,6 +254,7 @@ with durch:
         st.session_state["figs_durch"].append({
         "caption": ""
         })
+        
     # Display the images added to the section
     for i, image in enumerate(st.session_state["figs_durch"]):
         caption = st.text_input(f"Caption for Image {i+1}", value=image["caption"], key=f"im_caption_durch_{i}")
@@ -289,7 +290,6 @@ with durch:
         if remove_button1:
             st.session_state["subsections_durch"] = [subsection for i, subsection in enumerate(st.session_state["subsections_durch"]) if i not in choice_indices]
             remove_button = False
-        print(st.session_state["subsections_durch"])
 mydoc.doc.append(NoEscape(r'\newpage'))
 
 
@@ -334,14 +334,13 @@ with aus:
     if remove_button:
         st.session_state["subsections_aus"] = [subsection for i, subsection in enumerate(st.session_state["subsections_aus"]) if i not in choice_indices]
         remove_button = False
-    print(st.session_state["subsections_aus"])
     mydoc.doc.append(NoEscape(r'\newpage'))
 
 
 
 
 
-_,_,c,_ = st.columns(4)
+_,c,_= st.columns(3)
 
 with c :
     save_button = st.button("Compile", key="save_data")
