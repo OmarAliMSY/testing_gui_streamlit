@@ -5,6 +5,8 @@ from pylatex.utils import bold, NoEscape,escape_latex
 import streamlit as st
 from PIL import Image
 import os
+import json
+
 st.set_page_config(
     page_title="Data Acquisition",
     page_icon=r"favicon.ico",
@@ -15,6 +17,21 @@ st.set_page_config(
         'Report a bug': "https://www.extremelycoolapp.com/bug",
         'About': "# This is a header. This is an *extremely* cool app!"
     })
+# Load data from a file
+uploaded_file = st.file_uploader("Load Session state here")
+
+if uploaded_file is not None:
+    # Read the contents of the file
+    file_contents = uploaded_file.read()
+    
+    # Parse or process the data as needed
+    # For example, you can convert the data to a string and store it in a variable
+    loaded_data = json.loads(file_contents)
+
+    # You can then use loaded_data as a dictionary in your app
+    st.write("Loaded Data:")
+    st.session_state = loaded_data
+    st.write(loaded_data)
 # Initialize session state for each section's subsections and images
 if "subsections_ta" not in st.session_state:
     st.session_state["subsections_ta"] = []
@@ -101,11 +118,11 @@ path_pdf = "pdf_files/"
 
 c1,c2 = st.columns(2)
 with c1: 
-    author = st.text_input("Author:")
-    date = st.date_input("Date")
+    author = st.text_input("Author:",key="author")
+    date = st.date_input("Date:",key="date")
 with c2: 
-    tite = st.text_input("Title:")
-    bauteil = st.text_input("Bauteil:")
+    tite = st.text_input("Title:",key="title")
+    bauteil = st.text_input("Bauteil:",key="bauteil")
 
 
 mydoc = MyDoc()
@@ -340,7 +357,7 @@ with aus:
 
 
 
-_,c,_= st.columns(3)
+_,c,_,d= st.columns(4)
 
 with c :
     save_button = st.button("Compile", key="save_data")
@@ -359,3 +376,9 @@ with c :
                             data=PDFbyte,
                             file_name=f"{tite}.pdf",
                             mime='application/octet-stream')
+    with c :
+        export_button = st.button("EXP", key="exp_data")
+    if export_button:
+        with open(os.path.join("pdf_files/","sts.json"), 'w') as json_file:
+            print(type(st.session_state.to_dict()))
+            json.dump(st.session_state.to_dict(), json_file, indent=4, default=str)  # 'indent=4' is optional for pretty formatting

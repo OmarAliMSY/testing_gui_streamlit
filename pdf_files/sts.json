@@ -1,0 +1,48 @@
+{
+    "save_data": false,
+    "add_image_aus": false,
+    "secta": "sadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsad",
+    "asta": false,
+    "figs_tb": [],
+    "secaus": "",
+    "astb": false,
+    "msta": [],
+    "date": "2023-09-04",
+    "exp_data": true,
+    "subsections_durch": [],
+    "sectb": "",
+    "subsecaus0": "",
+    "subsec_title_aus_0": "",
+    "title": "",
+    "subsections_aus": [
+        {
+            "title": "",
+            "images": []
+        }
+    ],
+    "add_image_ta": false,
+    "add_image_ta_0": false,
+    "subsections_tb": [],
+    "author": "",
+    "asaus": false,
+    "asdurch": false,
+    "add_image_tb": false,
+    "figs_durch": [],
+    "bauteil": "",
+    "subsecta0": "sadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsadsadadssdadsad\n",
+    "aus_add_image_0": false,
+    "subsec_title_ta_0": "Title",
+    "figs_ta": [],
+    "figs_aus": [],
+    "aus_remove_data": false,
+    "remove_data_ta": false,
+    "secdu": "",
+    "subsections_ta": [
+        {
+            "title": "Title",
+            "content": "",
+            "images": []
+        }
+    ],
+    "add_image_durch": false
+}
