@@ -198,7 +198,6 @@ with ta:
         remove_button = False
     print(st.session_state["subsections_ta"])
 mydoc.doc.append(NoEscape(r'\newpage'))
-asdasdsad
 
 with tb:
     st.header("Testbeschreibung")

@@ -1,23 +1,29 @@
 from DB import DB
 from utils import get_att
 from db_layout import *
+import db_layout as layouts
 import numpy as np
 from datetime import datetime
 import os
 import csv 
 import json
 import time
+import re
+
 
 db103 = DB()
-db103.db_number = 103
 db103.layout = layout_db103
 db103.layout_dict, db103.dt_dict, db103.param_datetype = get_att(layout_db103)
-db103.ip = "192.168.29.102"
+db103.ip = input("Input the IP:") #"192.168.29.102"
+db103.db_number = input("Input DB Number:")
 params = np.array([vals for vals in db103.layout_dict.values()])
 db103.keys = params
 db103.temp_dict.update({k: [] for k in db103.keys if k not in db103.temp_dict.keys()})
 db103.temp_dict.update({"times" : []})
-db103.set_up()
+dblist = [elem for elem in dir(layouts) if "__" not in elem]
+db_nums = np.array([int(re.findall(pattern=r'\d+', string=db)[0]) for db in dblist])
+dbdict = {num: dbs for num, dbs in zip(db_nums, dblist)}
+db103.layout = eval(dbdict[int(db103.db_number)])
 i = 0
 data_dict = {"testname": "Test_Lorem", "Date": datetime.timestamp(datetime.now()), 
              "parameters": f"{db103.keys}",
@@ -27,6 +33,7 @@ data_dict["testname"] = input("Put Testname in: ")
 path = r"csv_data"
 filenamecsv = data_dict["testname"] + ".csv"
 filenamejson = data_dict["testname"] + ".json"
+db103.set_up()
 
 # Check if the CSV file exists and write the header only if it's a new file
 if not os.path.isfile(os.path.join(path, filenamecsv)):
@@ -40,7 +47,6 @@ with open(os.path.join(path, filenamejson), 'w') as json_file:
 max_attempts = 10
 while True:
     try:
-        print(db103.temp_dict)
         db103.get_data()
         i += 1
         db103.temp_dict["times"]  = db103.times
@@ -69,6 +75,6 @@ while True:
             max_attempts -= 1
             continue
         else:
-            print('Failed to connect to the database after multiple attempts.')
+            print(f'Failed to connect to the database after multiple attempts Time: {db103.times}.')
             break
 
