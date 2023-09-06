@@ -376,9 +376,9 @@ with c :
                             data=PDFbyte,
                             file_name=f"{tite}.pdf",
                             mime='application/octet-stream')
-    with c :
-        export_button = st.button("EXP", key="exp_data")
-    if export_button:
-        with open(os.path.join("pdf_files/","sts.json"), 'w') as json_file:
-            print(type(st.session_state.to_dict()))
-            json.dump(st.session_state.to_dict(), json_file, indent=4, default=str)  # 'indent=4' is optional for pretty formatting
+    #with c :
+    #    export_button = st.button("EXP", key="exp_data")
+    #if export_button:
+    #    with open(os.path.join("pdf_files/","sts.json"), 'w') as json_file:
+    #        #print(type(st.session_state.to_dict()))
+    #        json.dump(st.session_state.to_dict(), json_file, indent=4, default=str)  # 'indent=4' is optional for pretty formatting
