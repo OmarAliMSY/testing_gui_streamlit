@@ -1,6 +1,6 @@
 from pylatex import Document, PageStyle, Head, Foot, MiniPage, \
     StandAloneGraphic, MultiColumn, Tabu, LongTabu, LargeText, MediumText, \
-    LineBreak, NewPage, Tabularx, TextColor, simple_page_number,Command,Subsection,Section,Figure, Package, \
+    LineBreak, Center, Tabular,Table, TextColor, simple_page_number,Command,Subsection,Section,Figure, Package, \
     Tabu
 from pylatex.utils import bold, NoEscape,escape_latex
 import streamlit as st
@@ -122,27 +122,17 @@ class MyDoc:
                 pic.add_image(image_path, width=NoEscape(f"{scale}"+r"\textwidth"))
                 pic.add_caption(caption)
 
-    def generate_latex_table(self,input_data, rows, cols):
-        latex_table = "\\begin{center} \\begin{tabular}{|"
-        for _ in range(cols):
-            latex_table += f"p{{{1/(cols+1)}\\textwidth}}|"
-        latex_table += "}\n\\hline\n"
-        for i in range(rows):
-            for j in range(cols):
-                index = i * cols + j
-                if index < len(input_data):
-                    cell_value = input_data[index]
-                else:
-                    cell_value = ""
-                latex_table += str(cell_value) + " & "
-            latex_table = latex_table[:-2]  # Remove the last ' & ' from the row
-            latex_table += " \\\\\n\\hline\n"
-
-        latex_table += "\\end{tabular}  \\end{center}"
-        self.doc.append(NoEscape(latex_table))
-        with self.doc.create(Subsection(title='h!')):
-                self.doc.append(NoEscape(latex_table))
-
+    
+    def table(self, data, caption=""):
+        num_columns = len(data[0])  # Get the number of columns from the first row
+        table_spec = '|'.join(['c'] * num_columns)  # Create the table specification
+        with self.doc.create(Table(position='h!')) as tab:
+            tab.add_caption(caption)
+            with tab.create(Tabular(table_spec,width=num_columns)) as table_data:
+                table_data.add_hline()
+                for row in data:
+                    table_data.add_row(row)
+                table_data.add_hline()            
 
     
 path_pdf = "pdf_files/"
@@ -190,13 +180,6 @@ mydoc.doc.preamble.append(Command('author', author))
 mydoc.doc.preamble.append(Command('date', date))
 mydoc.title_page(author=author, date=date, title=tite,bauteil=bauteil)
 
-t1,t2 = st.columns(2)
-
-ta = st.container()
-tb = st.container()
-durch = st.container()
-aus = st.container()
-
 
 
 
@@ -227,6 +210,7 @@ def add_section(title, label, subsections):
 
     if st.button(f"Add Table to {title}", key=f"add_table_{title}"):
         st.session_state[title]["tables"].append({
+            "title": "",
             "input_data": [],
             "rows": 0,
             "cols": 0,
@@ -245,26 +229,28 @@ def add_section(title, label, subsections):
     for i, table_sec in enumerate(st.session_state[title]["tables"]):
         rows = st.slider(min_value=0, max_value=10, step=1, key=f"table_rows_{title}_{i}", label=f"Rows for Table {i + 1}")
         cols = st.slider(min_value=0, max_value=10, step=1, key=f"table_cols_{title}_{i}", label=f"Cols for Table {i + 1}")
+        table_sec["title"] = f"{title}_{i}"
         # Create an empty table with the specified rows and cols
+        
         input_data = []
-        if cols > 0 and rows >0:
+        if cols > 0 and rows > 0:
             num_cols = cols
             fig_cols = st.columns(num_cols)
             for row in range(rows):
+                col_list = []
                 for col in range(cols):
                     with fig_cols[col % num_cols]:
-                        input_val = st.text_input(label=f'{row},{col}', key=f'input_{row}_{col}')
-                        input_data.append(input_val)
-
-
-
+                        input_val = st.text_input(label=f'Row:{row} Col:{col}', key=f'{table_sec["title"]}{row}_{col}')
+                    col_list.append(input_val)
+                input_data.append(col_list)
         table_sec["input_data"] = input_data
-                #input_data.append(col_list)
+        
+        
         if st.button(f"Generate LaTeX Table for Table {i + 1}", key=f"generate_table_{title}_{i}"):
             if rows > 0 and cols > 0:
-                input_data = table_sec["input_data"]
-                mydoc.generate_latex_table(table_sec["input_data"], rows, cols)
-                table_sec["input_data"] = input_data
+            
+                #mydoc.generate_latex_table(table_sec["input_data"], rows, cols)
+                mydoc.table(data=table_sec["input_data"],caption="Testtable")
                 table_sec["rows"] = rows
                 table_sec["cols"] = cols
                 st.session_state[title]["tables"][i] = table_sec
@@ -272,11 +258,13 @@ def add_section(title, label, subsections):
 
 
     # Remove Subsection button
+    tlist = [title["title"] for title in subsections[title]]
+    temp = list(((subsections[title])))
     choice_indices = st.multiselect(options=list(((subsections[title]))), label=f"Select subsections to remove from {title}", key=f"remove_subsection_{title}")
     if st.button(f"Remove Subsections from {title}", key=f"remove_button_{title}"):
-        subsections[title] = [subsection for i, subsection in enumerate(subsections[title]) if i not in choice_indices]
+        subsections[title] = [subsection for i, subsection in enumerate(tlist) if i not in choice_indices]
 
-
+    print(tlist,1)
     
 if "sections" not in st.session_state:
     st.session_state["sections"] = ["Testaufbau", "Testbeschreibung","Durchführung","Auswertung"]
@@ -292,7 +280,6 @@ for section in sections:
 
 
 #
-mydoc.doc.append(NoEscape(st.session_state["tt"]+r'\newpage'))
 mydoc.doc.append(NoEscape(r"\newpage \listoffigures \newpage \listoftables"))
 
 
@@ -309,6 +296,7 @@ with c :
 
     if save_button:
         with st.spinner('Compiling...'):
+
             mydoc.doc.generate_pdf(path_pdf + 'Test_Report', clean_tex=False)
             st.success('Done!')
 
