@@ -44,6 +44,7 @@ if not os.path.isfile(os.path.join(path, filenamecsv)):
 
 with open(os.path.join(path, filenamejson), 'w') as json_file:
     json.dump(data_dict, json_file, indent=4)  # 'indent=4' is op1tional for pretty formatting
+    
 max_attempts = 10
 while True:
     try:

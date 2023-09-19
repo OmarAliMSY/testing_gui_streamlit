@@ -169,7 +169,7 @@ aus = st.container()
 
 
 with ta:
-    st.header("Testaufbau")
+    st.header("Testaufbau",divider="rainbow")
     mydoc.section(i="ta",title="Testaufbau",label="Testaufbau")
     # Add the option to add images to the section
     if st.button("Add Image to Section", key="add_image_ta"):
@@ -218,7 +218,7 @@ mydoc.doc.append(NoEscape(r'\newpage'))
 
 
 with tb:
-    st.header("Testbeschreibung")
+    st.header("Testbeschreibung",divider="rainbow")
     mydoc.section(i="tb", title="Testbeschreibung", label="Testbeschreibung")
     if st.button("Add Image to Section", key="add_image_tb"):
         st.session_state["figs_tb"].append({
@@ -265,7 +265,7 @@ mydoc.doc.append(NoEscape(r'\newpage'))
 
 
 with durch:
-    st.header("Durchführung")
+    st.header("Durchführung",divider="rainbow")
     mydoc.section(i="du", title="Durchführung", label="Durchführung")
     if st.button("Add Image to Section", key="add_image_durch"):
         st.session_state["figs_durch"].append({
@@ -311,7 +311,7 @@ mydoc.doc.append(NoEscape(r'\newpage'))
 
 
 with aus:
-    st.header("Auswertung")
+    st.header("Auswertung",divider="rainbow")
     mydoc.section(i="aus", title="Auswertung", label="Auswertung")
     if st.button("Add Image to Section", key="add_image_aus"):
         st.session_state["figs_aus"].append({

@@ -32,7 +32,9 @@ if "temp" not in st.session_state:
     st.session_state["temp"] = False
 
 # Display header
-st.header('Testing')
+
+
+st.header(":gray[Testing]", divider='rainbow')
 
 # Database setup
 dblist = [elem for elem in dir(layouts) if "__" not in elem]
@@ -80,7 +82,6 @@ selected_values = st.multiselect("Select Values to Show", st.session_state["trac
 # Initialize database setup
 def init_setup():
     st.session_state["db"].set_up()
-st.write(st.session_state["db"].plc)
 
 # Set test name and initiate setup
 st.session_state["test_name"] = testname
