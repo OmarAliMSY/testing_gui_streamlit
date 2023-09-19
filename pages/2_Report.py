@@ -1,11 +1,12 @@
 from pylatex import Document, PageStyle, Head, Foot, MiniPage, \
     StandAloneGraphic, MultiColumn, Tabu, LongTabu, LargeText, MediumText, \
-    LineBreak, NewPage, Tabularx, TextColor, simple_page_number,Command,Subsection,Section,Figure, Package
+    LineBreak, NewPage, Tabular, Table, simple_page_number,Command,Subsection,Section,Figure, Package
 from pylatex.utils import bold, NoEscape,escape_latex
 import streamlit as st
 from PIL import Image
 import os
 import json
+
 
 st.set_page_config(
     page_title="Data Acquisition",
@@ -74,7 +75,7 @@ class MyDoc:
             template_content = template_file.read()
         image_path="MSG-Signet-Schwarz-CMYK-170414-01.png"
         image_path2 = "MSG-Signet-Schwarz-CMYK-170414-02.png"
-        
+
         # Replace placeholders with actual values
         template_content = template_content.replace("__IMAGE_PATH__", image_path)
         template_content = template_content.replace("__BT__", bauteil)
@@ -107,11 +108,20 @@ class MyDoc:
             image = Image.open(images)
             image.save(f"pdf_files/img{i}.png")
             image_path = f"img{i}.png"
-            
-            
+
+
             with self.doc.create(Figure(position='h!')) as pic:
                 pic.add_image(image_path, width=NoEscape(f"{scale}"+r"\textwidth"))
                 pic.add_caption(caption)
+    def table(self, data,cols,rows, caption=""):
+        
+        with self.doc.create(Tabular(f'|{cols*"c|"}')) as table_data:
+    
+            self.doc.append(NoEscape(f'\begin{{tabular}}{{| p{{{1/cols}*{chr(92)}textwidth}}}} |'))
+            for rowg in table_data:
+                self.doc.append(NoEscape(rowg))
+                self.doc.append(NoEscape(    r"\end{tabular}"))
+                print(rowg)
 
 
 path_pdf = "pdf_files/"
@@ -159,203 +169,99 @@ mydoc.doc.preamble.append(Command('author', author))
 mydoc.doc.preamble.append(Command('date', date))
 mydoc.title_page(author=author, date=date, title=tite,bauteil=bauteil)
 
-t1,t2 = st.columns(2)
-
-ta = st.container()
-tb = st.container()
-durch = st.container()
-aus = st.container()
 
 
+def add_section(title, label, subsections, tables):
+    mydoc.section(i=title, title=title, label=label)
 
-with ta:
-    st.header("Testaufbau",divider="rainbow")
-    mydoc.section(i="ta",title="Testaufbau",label="Testaufbau")
-    # Add the option to add images to the section
-    if st.button("Add Image to Section", key="add_image_ta"):
-        st.session_state["figs_ta"].append({
-        "caption": ""
-    })
-    # Display the images added to the section
-    for i, image in enumerate(st.session_state["figs_ta"]):
-        caption = st.text_input(f"Caption for Image {i+1}", value=image["caption"], key=f"im_caption_ta_{i}")
-        st.session_state["figs_ta"][i]["caption"] = caption
-        mydoc.fig(i=f"ta_{i}{image}", caption=caption)
-
-
-    if st.button("Add Subsection", key="asta"):
-        st.session_state["subsections_ta"].append({
+    # Initialize the section if it doesn't exist
+    if title not in st.session_state:
+        st.session_state[title] = {
             "title": "",
             "content": "",
-            "images": []
+            "images": [],
+            "tables": []
+        }
+
+    # Add the option to add images, subsections, or tables to the section
+    if st.button(f"Add Image to {title}", key=f"add_image_{title}"):
+        st.session_state[title]["images"].append({
+            "caption": ""
         })
 
-    for i, subsection in enumerate(st.session_state["subsections_ta"]):
-        title = st.text_input(f"Subsection {i+1} Title", value=subsection["title"], key=f"subsec_title_ta_{i}")
-        #content = st.text_area(f"Subsection {i+1} Content", value=subsection["content"], key=f"subsec_content_ta_{i}")
-        st.session_state["subsections_ta"][i]["title"] = title
-        #st.session_state["subsections_ta"][i]["content"] = content
-
-        mydoc.subsection(i=f"ta{i}", title=title, section=f"Testaufbau") 
-        if st.button(f"Add Image to Subsection {i+1}", key=f"add_image_ta_{i}"):
-            subsection["images"].append({
-                "caption": ""
-            })
-
-        for j, image in enumerate(subsection["images"]):
-            caption = st.text_input(f"Caption {j+1} Title", value=image["caption"], key=f"im_title_ta_{i}_{j}")
-            subsection["images"][j]["caption"] = caption
-
-            mydoc.fig(i=f"ta{i}_{j}", caption=caption)  # Call mydoc.fig for the added image
-    choice_indices = st.multiselect(options=list(range(len(st.session_state["subsections_ta"]))), label="Select subsections to remove",key="msta")
-    remove_button3 = st.button("Remove", key="remove_data_ta")
-
-    if remove_button3:
-        st.session_state["subsections_ta"] = [subsection for i, subsection in enumerate(st.session_state["subsections_ta"]) if i not in choice_indices]
-        remove_button = False
-    print(st.session_state["subsections_ta"])
-mydoc.doc.append(NoEscape(r'\newpage'))
-
-
-with tb:
-    st.header("Testbeschreibung",divider="rainbow")
-    mydoc.section(i="tb", title="Testbeschreibung", label="Testbeschreibung")
-    if st.button("Add Image to Section", key="add_image_tb"):
-        st.session_state["figs_tb"].append({
-        "caption": ""
-        })
-
-    # Display the images added to the section
-    for i, image in enumerate(st.session_state["figs_tb"]):
-        caption = st.text_input(f"Caption for Image {i+1}", value=image["caption"], key=f"im_caption_tb_{i}")
-        st.session_state["figs_tb"][i]["caption"] = caption
-        mydoc.fig(i=f"ta_{i}", caption=caption)
-
-    if st.button("Add Subsection", key="astb"):
-        st.session_state["subsections_tb"].append({
+    if st.button(f"Add Subsection to {title}", key=f"add_subsection_{title}"):
+        subsections[title].append({
             "title": "",
             "content": "",
-            "images": []
+            "images": [],
+            "tables": []
         })
 
-    for i, subsection in enumerate(st.session_state["subsections_tb"]):
-        title = st.text_input(f"Subsection {i+1} Title", value=subsection["title"], key=f"subsec_title_tb_{i}")
-        #content = st.text_area(f"Subsection {i+1} Content", value=subsection["content"], key=f"subsec_content_tb_{i}")
-        st.session_state["subsections_tb"][i]["title"] = title
-        #st.session_state["subsections_tb"][i]["content"] = content
-
-        mydoc.subsection(i=f"tb{i}", title=title, section="Testbeschreibung")  # Add this line to create the subsection in the PDF
-        if st.button(f"Add Image to Subsection {i+1}", key=f"tb_add_image_{i}"):
-            subsection["images"].append({
-                "caption": ""
-            })
-
-        for j, image in enumerate(subsection["images"]):
-            caption = st.text_input(f"Caption {j+1} Title", value=image["caption"], key=f"tbim_title_tb_{i}_{j}")
-            subsection["images"][j]["caption"] = caption
-            mydoc.fig(i=f"tb{i}_{j}", caption=caption)
-        choice_indices = st.multiselect(options=list(range(len(st.session_state["subsections_tb"]))), label="Select subsections to remove",key="mstb")
-        remove_button2 = st.button("Remove", key="remove_data_tb")
-
-        if remove_button2:
-            st.session_state["subsections_tb"] = [subsection for i, subsection in enumerate(st.session_state["subsections_tb"]) if i not in choice_indices]
-            remove_button = False
-
-mydoc.doc.append(NoEscape(r'\newpage'))
-
-
-with durch:
-    st.header("Durchführung",divider="rainbow")
-    mydoc.section(i="du", title="Durchführung", label="Durchführung")
-    if st.button("Add Image to Section", key="add_image_durch"):
-        st.session_state["figs_durch"].append({
-        "caption": ""
+    if st.button(f"Add Table to {title}", key=f"add_table_{title}"):
+        tables[title].append({
+            "rows": 0,
+            "cols": 0,
+            "input_data": []
         })
+
+    # Display the images, subsections, and tables added to the section
+    for i, image_sec in enumerate(st.session_state[title]["images"]):
+        caption = st.text_input(f"Caption for Image {i + 1}", value=image_sec["caption"], key=f"im_caption_{title}_{i}")
+        mydoc.fig(i=f"{title}_{i}{image_sec}", caption=caption)
+
+    for i, subsection in enumerate(subsections[title]):
+        sub_title = st.text_input(f"{title} - Subsection {i + 1} Title", value=subsection["title"], key=f"subsec_title_{title}_{i}")
+        subsection["title"] = sub_title
+
+        subsection["content"] = mydoc.subsection(i=f"{title}_{i}", title=sub_title, section=title)
         
-    # Display the images added to the section
-    for i, image in enumerate(st.session_state["figs_durch"]):
-        caption = st.text_input(f"Caption for Image {i+1}", value=image["caption"], key=f"im_caption_durch_{i}")
-        st.session_state["figs_durch"][i]["caption"] = caption
-        mydoc.fig(i=f"durch_{i}", caption=caption)
-    if st.button("Add Subsection", key="asdurch"):
-        st.session_state["subsections_durch"].append({
-            "title": "",
-            "content": "",
-            "images": []
-        })
-
-    for i, subsection in enumerate(st.session_state["subsections_durch"]):
-        title = st.text_input(f"Subsection {i+1} Title", value=subsection["title"], key=f"subsec_title_durch_{i}")
-        #content = st.text_area(f"Subsection {i+1} Content", value=subsection["content"], key=f"subsec_content_durch_{i}")
-        st.session_state["subsections_durch"][i]["title"] = title
-        #st.session_state["subsections_durch"][i]["content"] = content
-
-        mydoc.subsection(i=f"du{i}", title=title, section="Duchführung")  # Use content from st.text_area
-        if st.button(f"Add Image to Subsection {i+1}", key=f"durch_add_image_{i}"):
+        if st.button(f"Add Image to {title} - Subsection {i + 1}", key=f"add_image_{title}_{i}"):
             subsection["images"].append({
                 "caption": ""
             })
 
         for j, image in enumerate(subsection["images"]):
-            caption = st.text_input(f"Caption {j+1} Title", value=image["caption"], key=f"im_title_durch_{i}_{j}")
-            subsection["images"][j]["caption"] = caption
-            mydoc.fig(i=f"durch{i}_{j}", caption=caption)
+            sub_caption = st.text_input(f"Caption {j + 1} for {title} - Subsection {i + 1}", value=image["caption"], key=f"im_title_{title}_{i}_{j}")
+            mydoc.fig(i=f"{title}_{i}_{j}", caption=sub_caption)
 
-        choice_indices = st.multiselect(options=list(range(len(st.session_state["subsections_durch"]))), label="Select subsections to remove",key="msdurch")
-        remove_button1 = st.button("Remove", key="remove_data_durch")
+    for i, table_sec in enumerate(tables[title]):
+        rows = st.slider(min_value=0, max_value=10, step=1, key=f"table_rows_{title}_{i}", label=f"Rows for Table {i + 1}")
+        cols = st.slider(min_value=0, max_value=10, step=1, key=f"table_cols_{title}_{i}", label=f"Cols for Table {i + 1}")
+        # Create an empty table with the specified rows and cols
+        input_data = []
+        if cols > 0 and rows > 0:
+            num_cols = cols
+            fig_cols = st.columns(num_cols)
+            for row in range(rows):
+                col_list = []
+                for col in range(cols):
+                    with fig_cols[col % num_cols]:
+                        input_val = st.text_input(label=f'{row},{col}', key=f'{title,i}{row}_{col}')
+                        col_list.append(input_val)
+                input_data.append(col_list)
+        table_sec["input_data"] = input_data
 
-        if remove_button1:
-            st.session_state["subsections_durch"] = [subsection for i, subsection in enumerate(st.session_state["subsections_durch"]) if i not in choice_indices]
-            remove_button = False
-mydoc.doc.append(NoEscape(r'\newpage'))
+        if st.button(f"Generate LaTeX Table for Table {i + 1}", key=f"generate_table_{title}_{i}"):
+            if rows > 0 and cols > 0:
+                input_data = table_sec["input_data"]
+                #latex_table = generate_latex_table(input_data, rows, cols)
+                table_sec["input_data"] = input_data
+                table_sec["rows"] = rows
+                table_sec["cols"] = cols
+                #st.session_state[title]["tables"][i] = table_sec
 
+                mydoc.table(data=input_data,cols=table_sec["cols"],rows=table_sec["rows"])
+                #st.write(latex_table)  # D
 
-with aus:
-    st.header("Auswertung",divider="rainbow")
-    mydoc.section(i="aus", title="Auswertung", label="Auswertung")
-    if st.button("Add Image to Section", key="add_image_aus"):
-        st.session_state["figs_aus"].append({
-        "caption": ""
-        })
-    # Display the images added to the section
-    for i, image in enumerate(st.session_state["figs_aus"]):
-        caption = st.text_input(f"Caption for Image {i+1}", value=image["caption"], key=f"im_caption_aus_{i}")
-        st.session_state["figs_aus"][i]["caption"] = caption
-        mydoc.fig(i=f"aus_{i}", caption=caption)
-    if st.button("Add Subsection", key="asaus"):
-        st.session_state["subsections_aus"].append({
-            "title": "",
-            "images": []
-        })
-
-    for i, subsection in enumerate(st.session_state["subsections_aus"]):
-        title = st.text_input(f"Subsection {i+1} Title", value=subsection["title"], key=f"subsec_title_aus_{i}")
-        #content = st.text_area(f"Subsection {i+1} Content", value=subsection["content"], key=f"subsec_content_aus_{i}")
-        st.session_state["subsections_aus"][i]["title"] = title
-        #st.session_state["subsections_aus"][i]["content"] = content
-
-        mydoc.subsection(i=f"aus{i}", title=title, section="Auswertung")  # Use content from st.text_area
-        if st.button(f"Add Image to Subsection {i+1}", key=f"aus_add_image_{i}"):
-            subsection["images"].append({
-                "caption": ""
-            })
-
-        for j, image in enumerate(subsection["images"]):
-            caption = st.text_input(f"Caption {j+1} Title", value=image["caption"], key=f"im_title_aus_{i}_{j}")
-            subsection["images"][j]["caption"] = caption
-            mydoc.fig(i=f"aus{i}_{j}", caption=caption)
-
-    choice_indices = st.multiselect(options=list(range(len(st.session_state["subsections_aus"]))), label="Select subsections to remove")
-    remove_button = st.button("Remove", key="aus_remove_data")
-
-    if remove_button:
-        st.session_state["subsections_aus"] = [subsection for i, subsection in enumerate(st.session_state["subsections_aus"]) if i not in choice_indices]
-        remove_button = False
-    mydoc.doc.append(NoEscape(r'\newpage'))
-
-
-
-
+# Example usage for sections and subsections
+sections = ["Testaufbau", "AnotherSection"]  # Add your section titles here
+if "subsections" not in st.session_state:
+    st.session_state["subsections"] = {section: [] for section in sections}
+    st.session_state["tables"] = {section: [] for section in sections}
+subsections = st.session_state["subsections"]
+tables = st.session_state["tables"]
+for section in sections:
+    add_section(section, f"Label for {section}", subsections,tables=tables)
 
 _,c,_,d= st.columns(4)
 
@@ -376,9 +282,3 @@ with c :
                             data=PDFbyte,
                             file_name=f"{tite}.pdf",
                             mime='application/octet-stream')
-    #with c :
-    #    export_button = st.button("EXP", key="exp_data")
-    #if export_button:
-    #    with open(os.path.join("pdf_files/","sts.json"), 'w') as json_file:
-    #        #print(type(st.session_state.to_dict()))
-    #        json.dump(st.session_state.to_dict(), json_file, indent=4, default=str)  # 'indent=4' is optional for pretty formatting

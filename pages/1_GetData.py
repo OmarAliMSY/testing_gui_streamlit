@@ -65,7 +65,7 @@ if selected_params:
     db.temp_dict.update({k: [] for k in db.keys if k not in db.temp_dict.keys()})
     st.session_state["tracking_params"] = selected_params
 selected_params = st.session_state["tracking_params"]
-ip = st.text_input("Put in the IP:", value="192.168.29.152")
+ip = st.text_input("Put in the IP:", value="192.168.29.151")
 db.ip = str(ip)
 db.keys = selected_params
 
