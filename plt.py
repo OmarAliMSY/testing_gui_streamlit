@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-df = pd.read_csv(r"csv_data\server\csv_data\newtimestamp.csv")
+df = pd.read_csv(r"csv_data\server\csv_data\RGD_LAT_2.csv")
 
 df = df.drop(columns=["statusNumber", "errorCode"])
 fig, ax = plt.subplots(figsize=(20, 10))

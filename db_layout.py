@@ -73,11 +73,21 @@ layout_db4 = """
 """
 
 layout_db103 = """
-                94              maxLastMotorTorque          REAL
-                98              statusNumber                USINT
-                102             errorCode                   INT
-                104             northSensorAngle            REAL
-                108             southSensorAngle            REAL
-                112             TiltTwistAngle              REAL
-                124             TiltSetAngle                REAL
+                94              maxLastMotorTorquet1          REAL
+                98              statusNumbert1                USINT
+                102             errorCodet1                   INT
+                104             northSensorAnglet1            REAL
+                108             southSensorAnglet1            REAL
+                112             TiltTwistAnglet1              REAL
+                124             TiltSetAnglet1                REAL
+                128             actualeDeltaPhit1             REAL
+                146              maxLastMotorTorquet2          REAL
+                150              statusNumbert2                USINT
+                154             errorCodet2                   INT
+                156             northSensorAnglet2            REAL
+                150             southSensorAnglet2            REAL
+                164             TiltTwistAnglet2              REAL
+                176             TiltSetAnglet2                REAL
+                180             actualeDeltaPhit2             REAL
 """
+
