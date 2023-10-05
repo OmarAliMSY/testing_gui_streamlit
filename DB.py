@@ -28,7 +28,7 @@ class DB:
         self.layout_dict = {}
         self.db_number = None
         self.dt_dict = {}
-        self.data_types = {"USINT": 1, "BOOL": 2, "REAL": 4, "DTL": 12, "INT": 2}
+        self.data_types = {"USINT": 1, "BOOL": 2, "REAL": 4, "DTL": 12, "INT": 2, "STRUCT": 2}
         self.keys = []
         self.plc = None
         self.db  = None
@@ -45,6 +45,7 @@ class DB:
         print(f'Connecting to: {self.ip,self.db_number}')
         row_size = int(list(self.layout_dict.keys())[-1]) - int(list(self.layout_dict.keys())[0]) + self.data_types[
             self.dt_dict[int(list(self.layout_dict.keys())[-1])]]
+        print(row_size)
         size = int(list(self.layout_dict.keys())[-1]) + self.data_types[
             self.dt_dict[int(list(self.layout_dict.keys())[-1])]]
         self.plc = snap7.client.Client()

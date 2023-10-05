@@ -1,7 +1,7 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
-df = pd.read_csv(r"csv_data\server\csv_data\RGD_LAT_2.csv")
+df = pd.read_csv(r"csv_data\server\csv_data\231005-LAT.csv")
 
 df = df.drop(columns=["statusNumber", "errorCode"])
 fig, ax = plt.subplots(figsize=(20, 10))
@@ -9,8 +9,8 @@ print(len(df["times"]),len(df["times"])/3600/24)
 
 
 # Plot the columns
-df.plot(x="times", y=["northSensorAngle", "southSensorAngle", "TiltSetAngle"], ax=ax,ylabel="Angle in [°]")
-df.plot(x="times", y="maxLastMotorTorque", secondary_y=True, ax=ax, color="blue",ylabel="Torque in [%]")
+df.plot(x="times", y=["northSensorAngle", "southSensorAngle", "TiltSetAngle","northSensorAnglet2", "southSensorAnglet2", "TiltSetAnglet2"], ax=ax,ylabel="Angle in [°]")
+df.plot(x="times", y=["maxLastMotorTorque","maxLastMotorTorquet2"], secondary_y=True, ax=ax, ylabel="Torque in [%]")
 
 # Adjust x-axis labels
 num_ticks = 10  # You can adjust the number of ticks as needed
