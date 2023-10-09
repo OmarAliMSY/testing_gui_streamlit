@@ -91,3 +91,7 @@ layout_db103 = """
                 180             actualeDeltaPhit2             REAL
 """
 
+layout_db102 = """
+                90              torque_abs                    REAL
+                94              maxLastMotorTorquet1          REAL
+"""
