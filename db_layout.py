@@ -81,8 +81,8 @@ layout_db103 = """
                 112             TiltTwistAnglet1              REAL
                 124             TiltSetAnglet1                REAL
                 128             actualeDeltaPhit1             REAL
-                146              maxLastMotorTorquet2          REAL
-                150              statusNumbert2                USINT
+                146             maxLastMotorTorquet2          REAL
+                150             statusNumbert2                USINT
                 154             errorCodet2                   INT
                 156             northSensorAnglet2            REAL
                 150             southSensorAnglet2            REAL

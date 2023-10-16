@@ -1,29 +1,51 @@
 import pandas as pd
 import matplotlib.pyplot as plt
-
-df = pd.read_csv(r"csv_data\server\csv_data\231005-LAT.csv")
-
-df = df.drop(columns=["statusNumber", "errorCode"])
-fig, ax = plt.subplots(figsize=(20, 10))
-print(len(df["times"]),len(df["times"])/3600/24)
+from glob import glob
+import re
+import matplotlib.dates as mdates
+import matplotlib.ticker as mticker
 
 
-# Plot the columns
-df.plot(x="times", y=["northSensorAngle", "southSensorAngle", "TiltSetAngle","northSensorAnglet2", "southSensorAnglet2", "TiltSetAnglet2"], ax=ax,ylabel="Angle in [°]")
-df.plot(x="times", y=["maxLastMotorTorque","maxLastMotorTorquet2"], secondary_y=True, ax=ax, ylabel="Torque in [%]")
+csv_paths = glob("csv_data/231012/*.csv")
+m_list = []
 
-# Adjust x-axis labels
-num_ticks = 10  # You can adjust the number of ticks as needed
-x_ticks_indices = range(0, len(df), len(df) // num_ticks)
-x_tick_labels = df["times"].iloc[x_ticks_indices]
-plt.xticks(x_ticks_indices, x_tick_labels)  # No rotation and alignment for now
+# Determine the number of subplots needed
+num_plots = len(csv_paths)
+num_cols = 3  # Number of columns in the grid
+num_rows = (num_plots + num_cols - 1) // num_cols
 
-# Rotate and align labels
-plt.gcf().autofmt_xdate(rotation=45, ha="right")  # Rotate and align after setting xticks
+# Create a grid of subplots
+fig, axs = plt.subplots(num_rows, num_cols, figsize=(15, 5 * num_rows))
 
+# Flatten axs if it's a 1D array
+if num_rows == 1:
+    axs = [axs]
+
+for i, csv_file in enumerate(csv_paths):
+    kg = re.findall(r'\d+', csv_file)[-1]
+    m_list.append(kg)
+    df = pd.read_csv(csv_file)
+    row_idx = i // num_cols
+    col_idx = i % num_cols
+    ax = axs[row_idx][col_idx]
+    
+    ax.plot(df["times"], df["northSensorAnglet2"], label=f"Angle {kg} kg")
+    ax.plot(df["times"], df["torque_abs"], label=f"Torque {kg} kg")
+    ax.set_title(f"Weight: {kg} kg")
+    ax.legend()
+    n = i
+    num_ticks = 10
+    x_ticks_indices = range(0, len(df), len(df) // num_ticks)
+    x_tick_labels = df["times"].iloc[x_ticks_indices]
+    ax.set_xticks(x_ticks_indices)
+    ax.set_xticklabels(x_tick_labels, rotation=45, ha="right")
+
+
+
+
+    plt.gcf().autofmt_xdate(rotation=45, ha="right")
+# Adjust layout
+plt.tight_layout()
+
+# Show the plot
 plt.show()
-
-
-
-
-
