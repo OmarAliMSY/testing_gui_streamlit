@@ -56,6 +56,9 @@ class DB:
                         specification=self.layout, row_size=row_size, size=1,
                         layout_offset=int(list(self.layout_dict.keys())[0]),
                         db_offset=int(list(self.layout_dict.keys())[0]))
+       
+        
+
     def get_data(self):
         """
         Retrieve data from the database.
@@ -65,6 +68,7 @@ class DB:
         - interval (int): Time interval between data reads.
         - t (int): Number of data readings to perform.
         """
+        
         self.db.read(self.plc)
         current_time = time.time()
 
@@ -73,8 +77,6 @@ class DB:
 
 
         # Append the formatted time to the list
-        
-
         # Update the x-axis data with the new list of formatted times
         
         for key in self.keys:
@@ -84,7 +86,7 @@ class DB:
 
 
         
-        time.sleep(1)
+        time.sleep(0.25)
         
 
 

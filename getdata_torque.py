@@ -26,7 +26,7 @@ def combine_keys(keys_list):
     return list(set(flattened_keys))  # Use set to remove duplicates
 
 db_config_103 = {"db_layout" :layout_db103,"ip":"192.168.29.150","db_number":103,}
-db_config_102 = {"db_layout" :layout_db102,"ip":"192.168.29.152","db_number":102}
+db_config_102 = {"db_layout" :layout_db105,"ip":"192.168.29.150","db_number":105}
 
 def setup_db (db_config):
     db = DB()
@@ -42,6 +42,7 @@ def setup_db (db_config):
   
     db.set_up()
     return db
+
 db1 = setup_db(db_config_103)
 db2 = setup_db(db_config_102)
 

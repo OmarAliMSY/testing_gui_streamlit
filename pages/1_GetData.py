@@ -13,6 +13,7 @@ import time
 import os
 import json
 import csv
+import traceback
 
 # Streamlit configuration settings
 st.set_page_config(
@@ -211,6 +212,9 @@ if selected_params and st.session_state["con"]:
             try:
                     db.set_up()
                     print(e)
+                    time.sleep(2)
+                    max_attempts -= 1
+                    print(traceback.format_exc())
             except Exception as f:
                 with st.spinner('Reconnecting'):
                     print(max_attempts)
