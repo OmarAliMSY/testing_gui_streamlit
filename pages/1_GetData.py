@@ -3,11 +3,11 @@ import matplotlib.pyplot as plt
 import streamlit as st
 import DB
 import re
-import db_layout as layouts
+import utils.db_layout as layouts
 import plotly.express as px
 import pandas as pd
-from db_layout import *
-from utils import get_att
+from utils.db_layout import *
+from utils.utils import get_att
 from datetime import datetime
 import time
 import os
@@ -66,7 +66,7 @@ if selected_params:
     db.temp_dict.update({k: [] for k in db.keys if k not in db.temp_dict.keys()})
     st.session_state["tracking_params"] = selected_params
 selected_params = st.session_state["tracking_params"]
-ip = st.text_input("Put in the IP:", value="192.168.29.151")
+ip = st.text_input("Put in the IP:", value="192.168.29.150")
 db.ip = str(ip)
 db.keys = selected_params
 

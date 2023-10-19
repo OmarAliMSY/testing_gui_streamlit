@@ -1,11 +1,11 @@
 import json
 import time
 import snap7
-from Snap7_Server.db_layout import *
+from utils.db_layout import *
 from snap7 import util
 import csv
 from datetime import datetime as dt
-from utils import get_unique_filename
+from utils.utils import get_unique_filename
 import os
 
 class DB:
@@ -51,6 +51,7 @@ class DB:
         self.plc = snap7.client.Client()
         self.plc.connect(self.ip, 0, 1)
         self.db_number = int(self.db_number)
+        print(size)
         all_data1 = self.plc.db_read(self.db_number, 0, size)
         self.db = util.DB(db_number=self.db_number, bytearray_=all_data1,
                         specification=self.layout, row_size=row_size, size=1,
