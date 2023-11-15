@@ -1,7 +1,7 @@
 from DB import DB
-from utils import get_att
-from db_layout import *
-import db_layout as layouts
+from utils.utils import get_att
+from utils.db_layout import *
+import utils.db_layout as layouts
 import numpy as np
 from datetime import datetime
 import os
@@ -26,7 +26,7 @@ def combine_keys(keys_list):
     return list(set(flattened_keys))  # Use set to remove duplicates
 
 db_config_103 = {"db_layout" :layout_db103,"ip":"192.168.29.150","db_number":103,}
-db_config_102 = {"db_layout" :layout_db105,"ip":"192.168.29.150","db_number":105}
+db_config_105 = {"db_layout" :layout_db105,"ip":"192.168.29.150","db_number":105}
 
 def setup_db (db_config):
     db = DB()
@@ -44,7 +44,7 @@ def setup_db (db_config):
     return db
 
 db1 = setup_db(db_config_103)
-db2 = setup_db(db_config_102)
+db2 = setup_db(db_config_105)
 
 dbs = [db1,db2]
 

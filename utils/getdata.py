@@ -1,5 +1,5 @@
 from DB import DB
-from utils import get_att
+from utils.utils import get_att
 from db_layout import *
 import numpy as np
 from datetime import datetime
