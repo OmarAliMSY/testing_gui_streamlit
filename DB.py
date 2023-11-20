@@ -81,6 +81,7 @@ class DB:
         # Update the x-axis data with the new list of formatted times
         
         for key in self.keys:
+            print(self.db[0][key],"ASD",key,self.db[0])
             self.temp_dict[key].append(self.db[0][key])
 
         self.times.append(formatted_time)

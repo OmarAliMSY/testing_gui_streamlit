@@ -49,7 +49,8 @@ for i, csv_path in enumerate(csv_paths):
     if kg[-1] == "3425":
         torque = df["torquet2"].rolling(10).mean() * -110
     else:
-        torque = df["torque_abs"].rolling(10).mean() *5/2
+        torque = ((df["torque_percentage"]* 400) - 200) 
+        #torque = df["torque_percentage"].rolling(10).mean()
     times = df["times"]
     angle = np.array(df["northSensorAnglet2"],dtype=np.float16)
     times = [datetime.strptime(time, date_format) for time in times]

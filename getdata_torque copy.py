@@ -25,8 +25,8 @@ def combine_keys(keys_list):
     flattened_keys = [key for keys in keys_list for key in keys]
     return list(set(flattened_keys))  # Use set to remove duplicates
 
-configlist = [{"db_layout" :layout_db103,"ip":"192.168.29.150","db_number":103,},
-{"db_layout" :layout_db105,"ip":"192.168.29.150","db_number":105}]
+configlist = [db_config_103 = {"db_layout" :layout_db103,"ip":"192.168.29.150","db_number":103,},
+db_config_105 = {"db_layout" :layout_db105,"ip":"192.168.29.150","db_number":105}]
 
 def setup_db (db_config):
     db = DB()
@@ -51,9 +51,9 @@ dbs = [setup_db(configs) for configs in configlist]
 
 
 data_dict = {"testname": "Test_Lorem", "Date": datetime.timestamp(datetime.now()), 
-                "parameters": f"{dbs[0].keys}",
+                "parameters": f"{db[0].keys}",
                 "ip": dbs[0].ip,
-                "DB-Number": f"{dbs[0].db_number}"}
+                "DB-Number": f"{db[0].db_number}"}
 
 data_dict["testname"] = input("Put Testname in: ")
 if dbs:
@@ -92,14 +92,16 @@ while True:
         #db2.temp_dict["times"] = db2.times
 
         # Create a new dictionary with the last values of each key from both databases
-            last_data = {convert_numpy_arrays({key: value[-1] for key, value in db.temp_dict.items()}) for db in dbs}
+            last_data = {**convert_numpy_arrays({key: value[-1] for key, value in db1.temp_dict.items()}),
+                     **convert_numpy_arrays({key: value[-1] for key, value in db2.temp_dict.items()})}
 
         i += 1
 
         if i % 5 == 0:
-            for db in dbs:
-                db.temp_dict = {key: [] for key in db.temp_dict.keys()}
-                db.times = []
+            db1.temp_dict = {key: [] for key in db1.temp_dict.keys()}
+            db2.temp_dict = {key: [] for key in db2.temp_dict.keys()}
+            db1.times = []
+            db2.times = []
             max_attempts = 10
 
         # Write the last data row to the CSV file
@@ -110,8 +112,8 @@ while True:
     except Exception as e:
         try:
             if max_attempts > 0:
-                for db in dbs:
-                    db.set_up() 
+                db1.set_up()
+                db2.set_up()
                 max_attempts -= 1
                 time.sleep(1)  # Delay before retrying
                 continue

@@ -2,6 +2,8 @@
 """
 This is an example snap7 server. It doesn't do much, but accepts
 connection. Useful for running the python-snap7 test suite.
+192.168.178.118 works for Self testing in HO
+or get IP from ipconfig/all in cmd
 """
 import time
 import logging

@@ -9,13 +9,13 @@ POS_MAXLASTMOTORTORQUE=3454
 layout_db110="""
                 82          STW1                USINT
                 83          STW2                USINT
-                84.0        set_on              BOOL
+                84        set_on              BOOL
                 86          SetFrequ            REAL
                 90          ActFrequ            REAL
                 98          Speed               REAL
                 102         Current             REAL
                 106         Torque              REAL
-                114.0       local               BOOL
+                114       local               BOOL
                 124         nSoftOM             USINT
                 134         phi1                REAL
                 138         phi2                REAL
