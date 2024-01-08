@@ -49,8 +49,10 @@ for i, csv_path in enumerate(csv_paths):
     if kg[-1] == "3425":
         torque = df["torquet2"].rolling(10).mean() * -110
     else:
-        torque = ((df["torque_percentage"]* 400) - 200) 
-        #torque = df["torque_percentage"].rolling(10).mean()
+        df["torque_percentage"] *= 400
+        torque = df["torque_percentage"].rolling(5).mean()
+        print(df["torque_percentage"].describe())
+
     times = df["times"]
     angle = np.array(df["northSensorAnglet2"],dtype=np.float16)
     times = [datetime.strptime(time, date_format) for time in times]
@@ -75,7 +77,6 @@ for i, csv_path in enumerate(csv_paths):
     axs[i, 1].plot(np.array(angle)[closest_indices[0]:idx[0]], np.abs(torque[closest_indices[0]:idx[0]]),label=f"Torque {kg[-1]} kg",c="green")
     axs[i, 1].hlines(mean_value1, xmin=np.array(angle)[closest_indices[0]], xmax=np.array(angle)[idx[0]],label=f"Mean Torque {np.round(mean_value1)}")
     axs[i, 1].invert_xaxis()
-    #axs[i, 1].set_ylim(bottom=mean_value1-mean_value1/3, top=mean_value1+mean_value1/3)
 
     calculated_valueswe[kg[-1]] = [val *1 for val in calculated_valueswe[kg[-1]] ]
     if kg[-1] =="2865":
@@ -100,7 +101,6 @@ for i, csv_path in enumerate(csv_paths):
     axs[i, 0].plot(np.array(angle)[idx[1]:closest_indices[1]], np.abs(torque[idx[1]:closest_indices[1]]),c="green")
     axs[i, 0].hlines(mean_value2, xmin=np.array(angle)[idx[1]], xmax=np.array(angle)[closest_indices[1]],label=f'Mean Torque {np.round(mean_value2)}')
     axs[i, 1].legend(loc='upper left', bbox_to_anchor=(1, 0.5))
-    #axs[i, 0].set_ylim(bottom=mean_value2+mean_value2/5, top=mean_value2-mean_value2/5)
 
     axs[i, 0].legend(loc="best")
 
@@ -122,7 +122,7 @@ for i in range(len(csv_paths)):
 plt.show()
 plt.plot(kglist,meanlist1,label="West to East")
 plt.scatter(kglist,meanlist1,marker="o")
-plt.xlabel("Weight on East Side [kg]")
+plt.xlabel("Weight on West Side [kg]")
 plt.ylabel("Torque [Nm]")
 plt.plot(kglist,np.abs(meanlist2),label="East to West")
 plt.scatter(kglist,np.abs(meanlist2),marker="o")

@@ -79,15 +79,17 @@ class DB:
 
         # Append the formatted time to the list
         # Update the x-axis data with the new list of formatted times
-        
+        tlist = ["torque_t1","torque_t2","torque_abs","torque_percentage","southSensorAngle_t1","southSensorAngle_t2"]
         for key in self.keys:
-            print(self.db[0][key],"ASD",key,self.db[0])
+            if key in tlist:
+                print(self.db[0][key],key)
             self.temp_dict[key].append(self.db[0][key])
 
         self.times.append(formatted_time)
 
 
         
+
         time.sleep(0.25)
         
 

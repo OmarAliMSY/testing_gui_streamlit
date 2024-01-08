@@ -20,13 +20,13 @@ def convert_numpy_arrays(data_dict):
                     value[i] = item.tolist()
     return data_dict
 
-# Define a function to flatten and combine keys from lists of NumPy arrays
+# Define a function to flatten and combine keys from liTorsts of NumPy arrays
 def combine_keys(keys_list):
     flattened_keys = [key for keys in keys_list for key in keys]
     return list(set(flattened_keys))  # Use set to remove duplicates
 
-configlist = [db_config_103 = {"db_layout" :layout_db103,"ip":"192.168.29.150","db_number":103,},
-db_config_105 = {"db_layout" :layout_db105,"ip":"192.168.29.150","db_number":105}]
+configlist = [{"db_layout" :layout_db103,"ip":"192.168.29.150","db_number":103}
+              ,{"db_layout" :layout_db105,"ip":"192.168.29.150","db_number":105}]
 
 def setup_db (db_config):
     db = DB()
@@ -44,16 +44,12 @@ def setup_db (db_config):
     return db
 dbs = [setup_db(configs) for configs in configlist]
 
-#db1 = setup_db(db_config_103)
-#db2 = setup_db(db_config_105)
-
-#dbs = [db1,db2]
 
 
 data_dict = {"testname": "Test_Lorem", "Date": datetime.timestamp(datetime.now()), 
-                "parameters": f"{db[0].keys}",
+                "parameters": f"{dbs[0].keys}",
                 "ip": dbs[0].ip,
-                "DB-Number": f"{db[0].db_number}"}
+                "DB-Number": f"{dbs[0].db_number}"}
 
 data_dict["testname"] = input("Put Testname in: ")
 if dbs:
@@ -61,13 +57,12 @@ if dbs:
     data_dict["ip"] = [a.ip for a in dbs]
     data_dict["DB-Number"] = [a.db_number for a in dbs]
 
-path = r"csv_data"
+path = r"csv_data\torque_tests"
 filenamecsv = data_dict["testname"] + ".csv"
 filenamejson = data_dict["testname"] + ".json"
 
-# Check if the CSV file exists and write the header only if it's a new file
-print(data_dict["parameters"],type(data_dict["parameters"]))
-# Check if the CSV file exists and write the header only if it's a new file
+
+
 if not os.path.isfile(os.path.join(path, filenamecsv)):
     with open(os.path.join(path, filenamecsv), 'w') as f:
         print("created new file")
@@ -77,43 +72,54 @@ if not os.path.isfile(os.path.join(path, filenamecsv)):
     with open(os.path.join(path, filenamejson), 'w') as json_file:
         json.dump(convert_numpy_arrays(data_dict), json_file, indent=4)  # Convert NumPy arrays to lists
 
-max_attempts = 10
+# Converting numpy arrays in all dbs
+for db in dbs:
+    db.temp_dict = convert_numpy_arrays(db.temp_dict)
 
+# Function to merge temp_dicts from all dbs
+def merge_temp_dicts(dbs):
+    merged_dict = {}
+    for db in dbs:
+        for key, value in db.temp_dict.items():
+            if key not in merged_dict:
+                merged_dict[key] = value
+            else:
+                merged_dict[key].extend(value)
+    return merged_dict
+
+max_attempts = 10
 i = 0
+
 while True:
     try:
         for db in dbs:
             db.get_data()
             db.temp_dict["times"] = db.times
 
-        #db1.get_data()
-        #db2.get_data()
-
-        #db2.temp_dict["times"] = db2.times
-
-        # Create a new dictionary with the last values of each key from both databases
-            last_data = {**convert_numpy_arrays({key: value[-1] for key, value in db1.temp_dict.items()}),
-                     **convert_numpy_arrays({key: value[-1] for key, value in db2.temp_dict.items()})}
+        # Merging temp_dicts and times from all dbs
+        merged_temp_dict = merge_temp_dicts(dbs)
 
         i += 1
 
         if i % 5 == 0:
-            db1.temp_dict = {key: [] for key in db1.temp_dict.keys()}
-            db2.temp_dict = {key: [] for key in db2.temp_dict.keys()}
-            db1.times = []
-            db2.times = []
+            for db in dbs:
+                db.temp_dict = {key: [] for key in db.temp_dict.keys()}
+                db.times = []
             max_attempts = 10
 
         # Write the last data row to the CSV file
-        with open(os.path.join(r"csv_data", filenamecsv), 'a', newline='') as f:
+        with open(os.path.join(path, filenamecsv), 'a', newline='') as f:
             w = csv.DictWriter(f, combined_keys)  # Use combined parameters
+            # Extracting last values from merged_temp_dict
+            last_data = {key: value[-1] if value else None for key, value in merged_temp_dict.items()}
             w.writerow(last_data)
 
     except Exception as e:
         try:
             if max_attempts > 0:
-                db1.set_up()
-                db2.set_up()
+                # Re-setup all dbs
+                for db in dbs:
+                    db.set_up()
                 max_attempts -= 1
                 time.sleep(1)  # Delay before retrying
                 continue
